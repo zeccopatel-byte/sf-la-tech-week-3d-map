@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SF + LA Tech Week 2026 3D Map | Built by Zecco</title>
+<meta name="title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
+<meta name="description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
+<meta name="author" content="Zecco Patel">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/">
+<meta property="og:title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
+<meta property="og:description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
+<meta property="og:image" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="628">
+<meta property="og:site_name" content="SF + LA Tech Week 3D Map">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/">
+<meta name="twitter:title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
+<meta name="twitter:description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
+<meta name="twitter:image" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/og-image.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="ext-resource-dependency" content="./assets/you-pin.png" data-resource-id="youPin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="./assets/favicon-dark.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="./assets/favicon-light.png" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="./assets/favicon-dark.png">
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer="" src="/_vercel/insights/script.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#0a1020;overflow:hidden}
+a{color:#8fb8d8;text-decoration:none}
+a:hover{color:#c9dff0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes rainfall{to{transform:translateY(60px)}}
+@keyframes youPulse{0%{transform:scale(.6);opacity:.5}100%{transform:scale(2.6);opacity:0}}
+.twin-junction{cursor:pointer}
+.maplibregl-ctrl-attrib{background:rgba(10,16,32,.6)!important;color:#5a6a85;font-size:10px}
+.maplibregl-ctrl-attrib a{color:rgba(235,235,245,0.6)}
+.maplibregl-popup-content{background:#16181e!important;border:1px solid rgba(255,255,255,0.22);border-radius:4px!important;padding:12px 14px!important}
+.maplibregl-popup-tip{display:none}
+input::placeholder{color:#8a8a8a}
+</style>
+</helmet>
+<div style="position:fixed;inset:0;background:#0a1020;font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:#ffffff">
+  <div ref="{{ mapEl }}" style="position:absolute;inset:0"></div>
+
+  <sc-if value="{{ rainOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;pointer-events:none;background:rgba(30,45,80,0.16);overflow:hidden">
+      <div style="position:absolute;inset:-80px 0 0 0;background:repeating-linear-gradient(12deg, transparent 0 9px, rgba(165,195,255,0.14) 9px 10px);animation:rainfall .45s linear infinite"></div>
+      <div style="position:absolute;inset:-80px 0 0 0;background:repeating-linear-gradient(18deg, transparent 0 17px, rgba(165,195,255,0.08) 17px 19px);animation:rainfall .7s linear infinite"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ mobOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(0,0,0,0.35)"></div></sc-if>
+  <div style="position:absolute;top:{{ lpTop }};left:{{ lpX }};right:{{ lpR }};bottom:{{ lpBot }};max-height:{{ lpMaxH }};width:{{ lpW }};display:{{ lpDisp }};flex-direction:column;border-radius:6px;background-color:rgba(255,255,255,0.84);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.9),0 12px 36px rgba(0,0,0,0.18);font-family:'IBM Plex Sans',-apple-system,sans-serif;color:#191919;overflow:hidden">
+    <div style="flex:0 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column">
+    <div style="display:flex;flex-direction:column;gap:10px;padding:16px 14px 16px;border-bottom:1px solid rgba(25,25,25,0.1)">
+      <a href="https://www.zalak-patel.com/" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;align-self:flex-start"></a>
+      <sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">{{ cityShort }} TECH WEEK</span><button onClick="{{ closeSheet }}" title="Close" style="flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(25,25,25,0.14);background:#ffffff;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div></sc-if>
+      <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex: 1; min-width: 0; display: {{ cityTabDisp }}; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 2px; padding: 2px; border-radius: 4px; background-color: {{ segTrack }}">
+        <button onClick="{{ goSF }}" style="min-width: 0; height: 30px; padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 3px; border: none; background: {{ sfTabBg }}; color: {{ sfTabFg }}; font-family: inherit; font-size: clamp(11px, 0.95vw, 13px); letter-spacing: -0.01em; font-weight: 700; cursor: pointer">San Francisco</button>
+        <button onClick="{{ goLA }}" style="min-width: 0; height: 30px; padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 3px; border: none; background: {{ laTabBg }}; color: {{ laTabFg }}; font-family: inherit; font-size: clamp(11px, 0.95vw, 13px); letter-spacing: -0.01em; font-weight: 700; cursor: pointer">Los Angeles</button>
+      </div>
+        <button onClick="{{ toggleNight }}" title="{{ themeTitle }}" style="flex:none;width:34px;height:34px;border-radius:5px;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;background:#ffffff;border:1px solid rgba(25,25,25,0.14)" style-hover="background:#f0f0f0">
+        <sc-if value="{{ isNight }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></sc-if>
+        <sc-if value="{{ isDay }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></sc-if>
+      </button>
+      </div>
+      <div style="font-size: clamp(18px, 5vw, 22px); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; color: #191919; text-wrap: balance">{{ cityTitle }}</div>
+      <div style="font-size:13px;line-height:1.5;color:#4d4d4d;text-wrap:pretty">{{ cityDesc }}</div>
+      <div style="font-size:12px;line-height:1.5;color:#5c5c5c">Built independently by <a href="https://www.linkedin.com/in/zalak-zecco-patel-3a618890/" target="_blank" rel="noopener noreferrer" style="color:#191919;font-weight:600;text-decoration:underline;text-underline-offset:2px">Zecco</a>. Not affiliated with tech-week.com.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">DAY</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ dayPills }}" as="d" hint-placeholder-count="8">
+            <button onClick="{{ d.go }}" style="display:flex;align-items:center;gap:6px;height:{{ tH }};padding:0 11px;border-radius:3px;border:1px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font-family:inherit;font-size:12px;font-weight:600;cursor:pointer"><sc-if value="{{ d.hasDot }}" hint-placeholder-val="{{ false }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ d.dot }}"></span></sc-if>{{ d.label }}</button>
+          </sc-for>
+          <button onClick="{{ toggleTags }}" title="Show or hide event labels on the map" style="display:flex;align-items:center;gap:7px;height:{{ tH }};padding:0 8px 0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer">
+            Labels
+            <span style="position:relative;width:26px;height:15px;border-radius:999px;background:{{ tagTrack }}"><span style="position:absolute;top:2px;left:{{ tagKnob }};width:11px;height:11px;border-radius:50%;background:#ffffff"></span></span>
+          </button>
+          <button onClick="{{ openQR }}" title="Scan to open on your phone" style="display:flex;align-items:center;gap:6px;height:{{ tH }};padding:0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4M20 17v3"></path></svg>QR
+          </button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-top:1px solid rgba(25,25,25,0.1);font-size:11px;color:#5c5c5c">
+      <span>Data: <a href="https://www.tech-week.com/" target="_blank" rel="noopener noreferrer" style="color: rgb(25, 25, 25); font-weight: 700; text-decoration: underline; text-underline-offset: 2px;">tech-week.com</a></span>
+      <a href="https://www.zalak-patel.com/" target="_blank" rel="noopener noreferrer" style="color:#191919;font-weight:600">zalak-patel.com</a>
+    </div>
+  </div>
+
+  <div style="position:absolute;top:{{ rpTop }};right:{{ rpX }};left:{{ rpL }};bottom:{{ rpBot }};width:{{ rpW }};height:{{ rpH }};display:{{ rpDisp }};flex-direction:column;gap:10px;padding:10px;border-radius:6px;background-color:{{ rpGlass }};backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.9),0 12px 36px rgba(0,0,0,0.18);font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;color:#191919;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border-radius:5px;background:#ffffff;border:1px solid rgba(25,25,25,0.14)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+        <input value="{{ query }}" onInput="{{ onQuery }}" placeholder="Search events or themes..." style="flex:1;min-width:0;border:none;outline:none;background:transparent;color:#191919;font-family:inherit;font-size:{{ inFs }}">
+      </div>
+      
+      <sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><button onClick="{{ closeSheet }}" title="Close" style="flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(25,25,25,0.14);background:#ffffff;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></sc-if>
+      </div>
+    <div style="display: {{ rpSeg }}; grid-template-columns: 1fr 1fr; gap: 2px; padding: 2px; border-radius: 5px; border: 1px solid rgba(25,25,25,0.14); background-color: {{ segTrack }}">
+      <button onClick="{{ goEventsTab }}" style="height:30px;border-radius:3px;border:none;background:{{ evTabBg }};color:{{ evTabFg }};font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Events</button>
+      <button onClick="{{ goPlanTab }}" style="display:flex;align-items:center;justify-content:center;gap:6px;height:30px;border-radius:3px;border:none;background:{{ planTabBg }};color:{{ planTabFg }};font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">My Plan<sc-if value="{{ hasPlan }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:3px;background:#191919;color:#ffffff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ planCount }}</span></sc-if></button>
+    </div>
+    <sc-if value="{{ isEventsTab }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;display:flex;flex-direction:column;border-radius:5px;background:#ffffff;border:1px solid rgba(25,25,25,0.14);overflow:hidden">
+    <div style="display:flex;align-items:center;gap:8px;padding:0 12px;height:40px">
+      <button onClick="{{ toggleFilters }}" style="flex:1;display:flex;align-items:center;gap:8px;height:100%;padding:0;border:none;background:none;font-family:inherit;cursor:pointer;text-align:left">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.1em;color:#191919">FILTERS</span>
+        <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><span style="width:6px;height:6px;border-radius:50%;background:#191919"></span></sc-if>
+      </button>
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ clearAll }}" style="border:none;background:none;padding:0;font-family:inherit;font-size:12px;color:#5c5c5c;cursor:pointer">Clear ({{ selCount }})</button>
+      </sc-if>
+      <button onClick="{{ toggleFilters }}" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;padding:0;border:none;background:none;cursor:pointer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ filtersChev }}"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+    </div>
+    <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="max-height:min(46vh, 420px);overflow-y:auto;padding:0 12px 12px;display:flex;flex-direction:column;border-top:1px solid rgba(25,25,25,0.1)">
+      <sc-if value="{{ hasHome }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px;padding:12px 2px 14px;border-bottom:1px solid rgba(25,25,25,0.1)">
+        <sc-for list="{{ travelRows }}" as="tr" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">{{ tr.title }}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ tr.opts }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.go }}" style="height:{{ tH }};padding:0 9px;border-radius:3px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};font-family:inherit;font-size:12px;cursor:pointer">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;border-bottom:1px solid rgba(25,25,25,0.1)">
+          <button onClick="{{ g.toggleOpen }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;height:40px;padding:0 2px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:#191919;cursor:pointer;text-align:left">
+            <span>{{ g.title }}</span>
+            <span style="display:flex;align-items:center;gap:8px">
+              <sc-if value="{{ g.hasCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:3px;background:#191919;color:#ffffff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box">{{ g.count }}</span></sc-if>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ g.chev }}"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </span>
+          </button>
+          <sc-if value="{{ g.open }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:0 0 14px">
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.toggle }}" style="height:{{ tH }};padding:0 8px;border-radius:3px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};font-family:inherit;font-size:12px;cursor:pointer;white-space:nowrap">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ g.hasMore }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ g.toggleMore }}" style="align-self:flex-start;border:none;background:none;padding:0;font-family:inherit;font-size:12px;color:#4d4d4d;cursor:pointer">{{ g.moreLabel }}</button>
+          </sc-if>
+          </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+    </div>
+    <sc-if value="{{ gapActive }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:5px;background:#e6f6ea;border:1px solid rgba(48,209,88,0.4)">
+        <span style="flex:1;font-size:12px;line-height:1.35;color:#191919">{{ gapBanner }}</span>
+        <button onClick="{{ clearGap }}" style="flex:none;height:{{ tH }};padding:0 10px;border-radius:3px;border:none;background:#f0f0f0;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">Done</button>
+      </div>
+    </sc-if>
+    <div style="font-size:12px;font-weight:600;color:#5c5c5c;padding:0 2px">{{ eventCount }} Events</div>
+    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px">
+      <sc-for list="{{ eventCards }}" as="e" hint-placeholder-count="5">
+        <a href="{{ e.url }}" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;gap:6px;padding:14px 12px 14px 12px;border-radius:6px;background:#ffffff;border:1px solid rgba(25,25,25,0.14);cursor:pointer;color:#191919;text-decoration:none" style-hover="background:#f0f0f0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ e.dayColor }}"></span>
+            <span style="font-size:12px;font-weight:500;color:#191919">{{ e.dateLabel }}</span>
+            
+            <span style="margin-left:auto;width:24px;height:24px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.6" stroke-linecap="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="8 7 17 7 17 16"></polyline></svg>
+            </span>
+          </div>
+          <div style="font-size:14px;font-weight:700;line-height:1.3;text-wrap:pretty">{{ e.title }}</div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px"><div style="flex:1;min-width:0;font-size:12px;color:#5c5c5c">{{ e.venue }}</div><button onClick="{{ e.togglePlan }}" title="{{ e.planTitle }}" style="flex:none;display:flex;align-items:center;gap:4px;height:{{ tH }};padding:0 9px 0 7px;border-radius:5px;border:1px solid {{ e.planBorder }};background:{{ e.planBg }};color:{{ e.planFg }};font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">{{ e.planIcon }} {{ e.planText }}</button></div>
+        </a>
+      </sc-for>
+      <sc-if value="{{ hasMoreEvents }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ loadMore }}" style="height:36px;flex:none;border-radius:4px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">{{ moreEventsLabel }}</button>
+      </sc-if>
+      <sc-if value="{{ noEvents }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:24px 8px;text-align:center;font-size:12px;color:#5c5c5c">No events match these filters.</div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isPlanTab }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px">
+      <sc-if value="{{ planNoHome }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:5px;background:#ffffff;border:1px solid rgba(25,25,25,0.14);font-size:12px;color:#4d4d4d">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+          <span style="flex:1;min-width:0">Add your home base to see travel times</span>
+          <button onClick="{{ openHomeFromPlan }}" style="flex:none;border:none;background:none;padding:0;font-family:inherit;font-size:12px;font-weight:700;color:#191919;text-decoration:underline;text-underline-offset:2px;cursor:pointer">Set</button>
+        </div>
+      </sc-if>
+      <div style="flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+        <button onClick="{{ exportPdf }}" title="Printable itinerary" style="height:44px;border-radius:5px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"></path><rect x="3" y="9" width="18" height="8" rx="1"></rect><path d="M6 14h12v7H6z"></path></svg>PDF</button>
+        <button onClick="{{ exportImgFirst }}" title="Story-sized image of a day" style="height:44px;border-radius:5px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"></rect><circle cx="9" cy="10" r="1.5"></circle><path d="M21 16l-5-5-9 9"></path></svg>Image</button>
+        <button onClick="{{ exportIcs }}" title="Calendar file (.ics)" style="height:44px;border-radius:5px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Calendar</button>
+        
+      </div>
+
+      <button onClick="{{ toggleAuto }}" style="flex:none;display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 12px;border-radius:5px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">
+        <span style="display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4M8 15h3M13 15h3"></path></svg>Auto-plan a day</span><span style="font-size:11px;color:#5c5c5c">{{ autoChev }}</span>
+      </button>
+      <sc-if value="{{ autoOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:none;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:6px;background:#ffffff;border:1px solid rgba(25,25,25,0.14)">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">THEMES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ autoThemeChips }}" as="c" hint-placeholder-count="8">
+              <button onClick="{{ c.toggle }}" style="height:{{ tH }};padding:0 9px;border-radius:4px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};font-family:inherit;font-size:12px;cursor:pointer">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">DAY</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ autoDayPills }}" as="d" hint-placeholder-count="7">
+              <button onClick="{{ d.go }}" style="display:flex;align-items:center;gap:5px;height:{{ tH }};padding:0 10px;border-radius:4px;border:1px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font-family:inherit;font-size:12px;font-weight:600;cursor:pointer"><span style="width:6px;height:6px;border-radius:50%;background:{{ d.dot }}"></span>{{ d.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ runAuto }}" style="height:36px;border-radius:4px;border:none;background:#191919;color:#ffffff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">{{ autoCta }}</button>
+          <div style="font-size:11px;line-height:1.4;color:#5c5c5c">Picks up to 5 non-overlapping events close to each other, around what's already in your plan.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ planEmpty }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:22px 14px;border-radius:6px;background:#ffffff;border:1px dashed rgba(25,25,25,0.25);text-align:center">
+          <div style="font-size:14px;font-weight:700">Your week is wide open</div>
+          <div style="font-size:12px;line-height:1.45;color:#5c5c5c">Tap <span style="font-weight:700;color:#191919">+ Plan</span> on any event card or map pin, or let Auto-plan build a day for you.</div>
+        </div>
+      </sc-if>
+
+      <sc-for list="{{ planDays }}" as="pd" hint-placeholder-count="0">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:6px;background:#ffffff;border:1px solid rgba(25,25,25,0.14)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ pd.color }}"></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <span style="font-size:14px;font-weight:700">{{ pd.label }}</span>
+              <span style="font-size:11px;color:#5c5c5c">{{ pd.summary }}</span>
+            </div>
+            <button onClick="{{ pd.showRoute }}" title="Show this day's route on the map" style="height:{{ tH }};padding:0 9px;border-radius:3px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">Route</button>
+            <button onClick="{{ pd.exportImg }}" title="Download this day as an image" style="height:{{ tH }};padding:0 9px;border-radius:3px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;color:#191919;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer">Image</button>
+          </div>
+          <sc-for list="{{ pd.rows }}" as="r" hint-placeholder-count="0">
+            <sc-if value="{{ r.isEvent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:10px;padding:10px;border-radius:5px;background:#ffffff;border:1px solid {{ r.border }}">
+                <span style="width:22px;height:22px;flex:none;border-radius:50%;background:#ffffff;color:#111111;border:2px solid {{ pd.color }};box-sizing:border-box;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ r.n }}</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                  <span style="font-size:11px;font-weight:600;color:#5c5c5c;font-variant-numeric:tabular-nums">{{ r.range }}</span>
+                  <span style="font-size:13px;font-weight:700;line-height:1.3;text-wrap:pretty">{{ r.title }}</span>
+                  <span style="font-size:11px;color:#5c5c5c">{{ r.sub }}</span>
+                  <sc-if value="{{ r.conflict }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;margin-top:2px;padding:2px 7px;border-radius:6px;background:#fdecea;color:#c0322b;font-size:10px;font-weight:700;letter-spacing:0.03em">{{ r.conflictText }}</span></sc-if>
+                  <sc-if value="{{ r.tight }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;margin-top:2px;padding:2px 7px;border-radius:6px;background:#fff3e0;color:#9a5b00;font-size:10px;font-weight:700;letter-spacing:0.03em">{{ r.tightText }}</span></sc-if>
+                  <div style="display:flex;gap:10px;margin-top:3px">
+                    <a href="{{ r.gcal }}" target="_blank" rel="noopener noreferrer" style="font-size:11px;font-weight:600;color:#191919">+ Google Cal</a>
+                    <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer" style="font-size:11px;font-weight:600;color:#191919">Event page</a>
+                  </div>
+                </div>
+                <button onClick="{{ r.remove }}" title="Remove from plan" style="flex:none;width:{{ tS }};height:{{ tS }};border-radius:50%;border:none;background:#f0f0f0;color:#191919;font-size:13px;line-height:1;cursor:pointer;padding:0">×</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isLeg }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:3px;padding:0 0 0 20px">
+                <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:{{ r.color }}">
+                  <span style="width:2px;height:16px;border-radius:1px;background:{{ r.color }};opacity:0.7"></span>{{ r.text }}
+                </div>
+                <sc-if value="{{ r.hasAlt }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ r.alt }}" style="align-self:flex-start;margin-left:10px;border:none;background:none;padding:0;font-family:inherit;font-size:11px;font-weight:700;color:#c0322b;text-decoration:underline;text-underline-offset:2px;cursor:pointer">See nearby alternatives</button>
+                </sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ r.isGap }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:4px;border:1px dashed rgba(48,209,88,0.5);background:#effaf2">
+                <span style="flex:1;font-size:12px;font-weight:600;color:#1e7a3a">{{ r.text }}</span>
+                <button onClick="{{ r.fill }}" style="flex:none;height:{{ tH }};padding:0 10px;border-radius:3px;border:none;background:#1e7a3a;color:#ffffff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer">Fill this gap</button>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ showNudge }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;top:{{ ndTop }};bottom:{{ ndBot }};left:{{ ctrL }};right:{{ ctrR }};display:flex;justify-content:center;pointer-events:none">
+      <div style="pointer-events:auto;max-width:440px;display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:6px;background:#16181e;border:1px solid rgba(255,255,255,0.18);font-family:'IBM Plex Sans',-apple-system,sans-serif;color:#ffffff">
+        <span style="flex:1;font-size:13px;font-weight:600;line-height:1.35;text-wrap:pretty">{{ nudgeText }}</span>
+        <button onClick="{{ nudgeGo }}" style="flex:none;height:30px;padding:0 12px;border-radius:3px;border:none;background:#191919;color:#ffffff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">{{ nudgeCta }}</button>
+        <button onClick="{{ nudgeClose }}" style="flex:none;height:30px;padding:0 10px;border-radius:3px;border:none;background:rgba(255,255,255,0.12);color:#ffffff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Not now</button>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;z-index:60;top:{{ tsTop }};bottom:{{ tsBot }};left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;text-align:center;padding:{{ tsPad }};border-radius:{{ tsRad }};background:{{ tsBg }};backdrop-filter:{{ tsBlur }};-webkit-backdrop-filter:{{ tsBlur }};border:1px solid {{ tsBd }};box-shadow:{{ tsSh }};font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:13px;font-weight:600;color:{{ tsFg }};pointer-events:none">{{ toastText }}</div>
+  </sc-if>
+
+  <div style="position:absolute;top:{{ obTop }};bottom:{{ obBot }};left:{{ ctrL }};right:{{ ctrR }};display:{{ obDisp }};flex-direction:column;justify-content:center;align-items:center;gap:6px;pointer-events:none">
+    <sc-if value="{{ homeOpenDesk }}" hint-placeholder-val="{{ false }}">
+    <div style="pointer-events:auto;width:min(92vw, 340px);max-height:60vh;box-shadow:0 12px 32px rgba(0,0,0,0.22);overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:8px;background:#ffffff;border:1px solid rgba(25,25,25,0.14);color:#191919">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:15px;font-weight:700">Near me</span><button onClick="{{ closeHome }}" title="Close" style="flex:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(25,25,25,0.14);background:#ffffff;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+            <sc-if value="{{ homeShowSet }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">HOME BASE</span><span style="font-size:13px;font-weight:700;color:#191919">{{ homeName }}</span></div>
+                <button onClick="{{ homeChange }}" style="height:{{ tH }};padding:0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Change</button>
+                <button onClick="{{ homeClear }}" style="height:{{ tH }};padding:0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Clear</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ homeShowPick }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ homeLocate }}" style="height:36px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:4px;border:none;background:#191919;color:#ffffff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>Use my current location</button>
+              <div style="display:flex;gap:6px">
+                <input value="{{ homeQ }}" onInput="{{ onHomeQ }}" onKeyDown="{{ homeKey }}" placeholder="Enter your address" style="flex:1;min-width:0;height:34px;padding:0 10px;border-radius:4px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:{{ inFs }};outline:none">
+                <button onClick="{{ homeSearch }}" style="flex:none;height:34px;padding:0 12px;border-radius:4px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Go</button>
+              </div>
+              <sc-if value="{{ hasSugg }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;margin-top:-4px;border-radius:4px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;overflow:hidden">
+                  <sc-for list="{{ homeSugg }}" as="g" hint-placeholder-count="0">
+                    <button onClick="{{ g.go }}" style="display:flex;align-items:flex-start;gap:8px;min-height:44px;padding:8px 10px;border:none;border-bottom:1px solid rgba(25,25,25,0.08);background:#ffffff;color:#191919;font-family:inherit;text-align:left;cursor:pointer" style-hover="background:#f5f5f5">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:13px;font-weight:600;line-height:1.3">{{ g.name }}</span><span style="font-size:11px;color:#5c5c5c;line-height:1.3">{{ g.sub }}</span></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-if>
+            <span style="font-size:11px;color:#8a8a8a">Stays on your device.</span>
+          </div>
+    </sc-if>
+    <div style="pointer-events:auto;flex:none;display:flex;align-items:center;gap:2px;padding:3px;border-radius:3px;background:#16181e;border:1px solid rgba(255,255,255,0.18)">
+      <button onClick="{{ toggleOrbit }}" title="Drag the map to take control · press to resume orbit" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 12px 0 10px;border-radius:3px;border:none;background:{{ orbitBg }};color:#ffffff;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.04em;cursor:pointer">
+        <sc-if value="{{ orbiting }}" hint-placeholder-val="{{ true }}"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1" width="2.4" height="8" rx="0.6" fill="#fff"></rect><rect x="6.1" y="1" width="2.4" height="8" rx="0.6" fill="#fff"></rect></svg></sc-if>
+        <sc-if value="{{ notOrbiting }}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 1 L9 5 L2 9 Z" fill="#fff"></path></svg></sc-if>
+        {{ orbitLabel }}
+      </button>
+      <button onClick="{{ orbitSlower }}" title="Slower" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(235,235,245,0.8);font-size:14px;cursor:pointer;font-family:inherit">−</button>
+      <span style="min-width:26px;text-align:center;font-family:'IBM Plex Sans',sans-serif;font-variant-numeric:tabular-nums;font-size:10px;color:rgba(255,255,255,0.85)">{{ orbitSpeedLabel }}</span>
+      <button onClick="{{ orbitFaster }}" title="Faster" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(235,235,245,0.8);font-size:14px;cursor:pointer;font-family:inherit">+</button>
+      <button onClick="{{ orbitReverse }}" title="Reverse direction" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(235,235,245,0.8);font-size:13px;cursor:pointer;font-family:inherit">⇄</button>
+      <span style="width:1px;height:16px;margin:0 4px;background:rgba(255,255,255,0.18)"></span>
+      <button onClick="{{ toggleHome }}" title="Near me" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:3px;border:none;background:transparent;color:#ffffff;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:0.04em;cursor:pointer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>{{ homeChipLabel }}</button>
+    </div>
+</div>
+
+  <sc-if value="{{ mobIdle }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ openFilters }}" title="Filters" style="position:absolute;top:calc(10px + env(safe-area-inset-top));left:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};cursor:pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ gInk }}" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+    </button>
+    <div style="position:absolute;top:calc(10px + env(safe-area-inset-top));left:64px;right:64px;display:flex;justify-content:center">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px;width:100%;max-width:260px;border-radius:999px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};font-family:'IBM Plex Sans',-apple-system,sans-serif">
+        <button onClick="{{ goSF }}" style="height:36px;border-radius:999px;border:none;background:{{ mSfBg }};color:{{ mSfFg }};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">SF</button>
+        <button onClick="{{ goLA }}" style="height:36px;border-radius:999px;border:none;background:{{ mLaBg }};color:{{ mLaFg }};font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">LA</button>
+      </div>
+    </div>
+    <div style="position:absolute;top:calc(62px + env(safe-area-inset-top));left:10px;right:10px;display:flex;align-items:stretch;gap:8px;pointer-events:none">
+      <div style="flex:1;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:1px;padding:8px 14px;border-radius:16px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},0 6px 18px rgba(0,0,0,0.14);color:{{ gInk }};font-family:'IBM Plex Sans',-apple-system,sans-serif;text-align:center">
+        <span style="font-size:13px;font-weight:700;line-height:1.2">{{ mCapTitle }}</span>
+        <span style="font-size:11px;font-weight:500;line-height:1.3;color:{{ gSub }}">{{ mCapSub }}</span>
+      </div>
+      <button onClick="{{ openMobFilters }}" title="Filters" style="pointer-events:auto;position:relative;flex:none;width:48px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:16px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},0 6px 18px rgba(0,0,0,0.14);cursor:pointer">
+        <img src="./assets/filter-icon.png" alt="" width="20" height="20" style="display:block;width:20px;height:20px;filter:{{ gImgF }}">
+        <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:6px;right:7px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:#111111;color:#ffffff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ selCount }}</span></sc-if>
+      </button>
+    </div>
+    <div style="position:absolute;left:8px;right:8px;bottom:calc(40px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:6px">
+    <button onClick="{{ toggleHome }}" style="min-width:0;height:48px;display:flex;align-items:center;gap:6px;padding:0 13px;border-radius:999px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ gInk }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>{{ mNearLabel }}
+    </button>
+    <button onClick="{{ openEvents }}" style="min-width:0;height:48px;display:flex;align-items:center;gap:6px;padding:0 13px;border-radius:999px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ gInk }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Events
+    </button>
+    <button onClick="{{ openPlan }}" style="min-width:0;height:48px;display:flex;align-items:center;gap:6px;padding:0 13px;border-radius:999px;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ gInk }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6M8 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2"></path><path d="M9 11h6M9 15h4"></path></svg>My Plan
+      <sc-if value="{{ hasPlan }}" hint-placeholder-val="{{ false }}"><span style="min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:11px;background:#111111;color:#ffffff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ planCount }}</span></sc-if>
+    </button>
+    </div>
+    <button onClick="{{ toggleOrbit }}" title="{{ orbitLabel }}" style="position:absolute;right:10px;top:calc(10px + env(safe-area-inset-top));width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid {{ gBd }};background:{{ gBg }};backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 0 {{ gHi }},inset 0 -1px 0 rgba(255,255,255,0.2),0 10px 30px rgba(0,0,0,0.22);color:{{ gInk }};cursor:pointer">
+      <sc-if value="{{ orbiting }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 10 10"><rect x="1.5" y="1" width="2.4" height="8" rx="0.6" fill="{{ gInk }}"></rect><rect x="6.1" y="1" width="2.4" height="8" rx="0.6" fill="{{ gInk }}"></rect></svg></sc-if>
+      <sc-if value="{{ notOrbiting }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ gInk }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg></sc-if>
+    </button>
+  </sc-if>
+
+  <sc-if value="{{ homeOpenMob }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeHome }}" style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));box-sizing:border-box;background:rgba(0,0,0,0.35);font-family:'IBM Plex Sans',-apple-system,sans-serif">
+          <div onClick="{{ stopProp }}" style="width:100%;max-height:100%;overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:6px;background-color:rgba(255,255,255,0.86);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.9),0 12px 36px rgba(0,0,0,0.18);color:#191919">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:15px;font-weight:700">Near me</span><button onClick="{{ closeHome }}" title="Close" style="flex:none;width:36px;height:36px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(25,25,25,0.14);background:#ffffff;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+            <sc-if value="{{ homeShowSet }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:10px;font-weight:600;letter-spacing:0.1em;color:#5c5c5c">HOME BASE</span><span style="font-size:13px;font-weight:700;color:#191919">{{ homeName }}</span></div>
+                <button onClick="{{ homeChange }}" style="height:{{ tH }};padding:0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Change</button>
+                <button onClick="{{ homeClear }}" style="height:{{ tH }};padding:0 10px;border-radius:3px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Clear</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ homeShowPick }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ homeLocate }}" style="height:36px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:4px;border:none;background:#191919;color:#ffffff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>Use my current location</button>
+              <div style="display:flex;gap:6px">
+                <input value="{{ homeQ }}" onInput="{{ onHomeQ }}" onKeyDown="{{ homeKey }}" placeholder="Enter your address" style="flex:1;min-width:0;height:34px;padding:0 10px;border-radius:4px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:{{ inFs }};outline:none">
+                <button onClick="{{ homeSearch }}" style="flex:none;height:34px;padding:0 12px;border-radius:4px;border:1px solid rgba(25,25,25,0.16);background:#ffffff;color:#191919;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Go</button>
+              </div>
+              <sc-if value="{{ hasSugg }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;margin-top:-4px;border-radius:4px;border:1px solid rgba(25,25,25,0.14);background:#ffffff;overflow:hidden">
+                  <sc-for list="{{ homeSugg }}" as="g" hint-placeholder-count="0">
+                    <button onClick="{{ g.go }}" style="display:flex;align-items:flex-start;gap:8px;min-height:44px;padding:8px 10px;border:none;border-bottom:1px solid rgba(25,25,25,0.08);background:#ffffff;color:#191919;font-family:inherit;text-align:left;cursor:pointer" style-hover="background:#f5f5f5">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5c5c5c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:13px;font-weight:600;line-height:1.3">{{ g.name }}</span><span style="font-size:11px;color:#5c5c5c;line-height:1.3">{{ g.sub }}</span></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-if>
+            <span style="font-size:11px;color:#8a8a8a">Stays on your device.</span>
+          </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ qrOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeQR }}" style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.5);font-family:'IBM Plex Sans',-apple-system,sans-serif">
+      <div onClick="{{ stopProp }}" style="position:relative;width:min(92vw, 420px);max-height:90vh;display:flex;flex-direction:column;border-radius:8px;background:#ffffff;overflow:hidden">
+        <div style="flex:none;display:flex;justify-content:flex-end;padding:8px 8px 0"><button onClick="{{ closeQR }}" title="Close" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:50%;border:1px solid rgba(25,25,25,0.14);background:#ffffff;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button></div>
+        <div style="aspect-ratio:900 / 944;width:100%"><img src="./assets/tech-week-map-qr.png" alt="QR code to open the Tech Week 3D map" style="display:block;width:100%;height:100%;object-fit:contain"></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:rgba(10,16,32,0.85);backdrop-filter:blur(6px)">
+      <div style="width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,0.12);border-top-color:#191919;animation:spin 0.9s linear infinite"></div>
+      <div style="font-family:'IBM Plex Sans',sans-serif;font-variant-numeric:tabular-nums;font-size:12px;letter-spacing:0.18em;color:rgba(235,235,245,0.6)">SPINNING UP DIGITAL TWIN…</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ errorMsg }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,16,32,0.9)">
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px 34px;border-radius:6px;background:rgba(28,28,30,0.85);border:0.5px solid rgba(255,255,255,0.12);max-width:340px;text-align:center">
+        <div style="font-size:15px;font-weight:600">Map failed to load</div>
+        <div style="font-size:12px;color:rgba(235,235,245,0.6);line-height:1.5">{{ errorMsg }}</div>
+        <button onClick="{{ retry }}" style="height:34px;padding:0 22px;border-radius:3px;border:none;background:#191919;color:#ffffff;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit">Retry</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0a1020"></rect><g transform="translate(30,30)"><rect x="4" y="18" width="8" height="22" fill="#84a4c2"></rect><rect x="14" y="8" width="9" height="32" fill="#e8a04e"></rect><rect x="25" y="14" width="8" height="26" fill="#a8bccd"></rect><circle cx="8" cy="34" r="2.5" fill="#ee352e"></circle><circle cx="29" cy="30" r="2.5" fill="#00a1de"></circle></g></svg></template></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;trafficDensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1.5,&quot;min&quot;:0.5,&quot;max&quot;:3,&quot;step&quot;:0.25,&quot;unit&quot;:&quot;×&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Traffic&quot;},&quot;simSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:2,&quot;min&quot;:0.5,&quot;max&quot;:4,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;×&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Traffic&quot;}}">
+class Component extends DCLogic {
+  static CITIES = {
+    chi: {
+      name: "Chicago", tz: "America/Chicago", tzLabel: "CT",
+      cam: { center: [-87.6298, 41.8795], zoom: 15.4, pitch: 66, bearing: -20 },
+      corridors: [
+        { id: "lsd", coords: [[-87.6167,41.8508],[-87.6203,41.8672],[-87.6244,41.8757],[-87.6220,41.8860],[-87.6139,41.8975],[-87.6317,41.9282]] },
+        { id: "michigan", coords: [[-87.6243,41.8663],[-87.6243,41.8757],[-87.6242,41.8858],[-87.6244,41.8968],[-87.6244,41.9000]] },
+        { id: "state", coords: [[-87.6278,41.8673],[-87.6278,41.8781],[-87.6278,41.8858],[-87.6281,41.8967]] },
+        { id: "madison", coords: [[-87.6243,41.8819],[-87.6318,41.8818],[-87.6413,41.8817],[-87.6669,41.8814]] },
+        { id: "wacker", coords: [[-87.6244,41.8877],[-87.6338,41.8867],[-87.6373,41.8866],[-87.6376,41.8767]] },
+        { id: "congress", coords: [[-87.6244,41.8757],[-87.6318,41.8757],[-87.6413,41.8756],[-87.6600,41.8755]] },
+        { id: "halsted", coords: [[-87.6469,41.8660],[-87.6470,41.8815],[-87.6473,41.8963],[-87.6483,41.9100]] },
+        { id: "chicagoave", coords: [[-87.6244,41.8968],[-87.6357,41.8966],[-87.6553,41.8963],[-87.6774,41.8959]] }
+      ],
+      lines: [
+        { id: "red", color: "#c60c30", trains: 6, coords: [[-87.6726,42.0190],[-87.6579,41.9645],[-87.6534,41.9399],[-87.6528,41.9254],[-87.6491,41.9107],[-87.6314,41.9038],[-87.6280,41.8966],[-87.6278,41.8858],[-87.6277,41.8782],[-87.6274,41.8673],[-87.6305,41.8532],[-87.6306,41.8310],[-87.6341,41.7954],[-87.6252,41.7504]] },
+        { id: "blue", color: "#00a1de", trains: 6, coords: [[-87.9019,41.9786],[-87.8089,41.9820],[-87.7607,41.9707],[-87.7292,41.9527],[-87.7124,41.9384],[-87.7086,41.9297],[-87.6870,41.9160],[-87.6663,41.9032],[-87.6553,41.8963],[-87.6473,41.8912],[-87.6318,41.8858],[-87.6293,41.8804],[-87.6318,41.8757],[-87.6411,41.8755],[-87.6594,41.8756],[-87.6889,41.8757],[-87.7264,41.8737],[-87.8172,41.8737]] },
+        { id: "brn", color: "#8a5a2b", trains: 4, coords: [[-87.7131,41.9679],[-87.6889,41.9664],[-87.6753,41.9616],[-87.6741,41.9471],[-87.6638,41.9439],[-87.6534,41.9399],[-87.6528,41.9254],[-87.6390,41.9107],[-87.6357,41.8965],[-87.6338,41.8887],[-87.6338,41.8829],[-87.6337,41.8786],[-87.6318,41.8768],[-87.6279,41.8768],[-87.6261,41.8794],[-87.6260,41.8832],[-87.6278,41.8858],[-87.6318,41.8858],[-87.6338,41.8887]] },
+        { id: "g", color: "#009b3a", trains: 5, coords: [[-87.8039,41.8869],[-87.7456,41.8862],[-87.7062,41.8845],[-87.6666,41.8857],[-87.6522,41.8855],[-87.6410,41.8856],[-87.6318,41.8858],[-87.6278,41.8858],[-87.6261,41.8794],[-87.6270,41.8673],[-87.6260,41.8531],[-87.6257,41.8310],[-87.6184,41.7952],[-87.6636,41.7794]] },
+        { id: "org", color: "#f9461c", trains: 3, coords: [[-87.7373,41.7866],[-87.7041,41.8043],[-87.6841,41.8046],[-87.6806,41.8290],[-87.6484,41.8462],[-87.6270,41.8673],[-87.6279,41.8768],[-87.6318,41.8768],[-87.6338,41.8829],[-87.6318,41.8858],[-87.6278,41.8858],[-87.6260,41.8832],[-87.6261,41.8794]] },
+        { id: "pink", color: "#e27ea6", trains: 3, coords: [[-87.7565,41.8518],[-87.7246,41.8536],[-87.6944,41.8541],[-87.6753,41.8544],[-87.6690,41.8580],[-87.6693,41.8715],[-87.6666,41.8857],[-87.6410,41.8856],[-87.6318,41.8858],[-87.6278,41.8858],[-87.6260,41.8832],[-87.6261,41.8794],[-87.6279,41.8768],[-87.6337,41.8786]] },
+        { id: "p", color: "#522398", trains: 2, coords: [[-87.6906,42.1063],[-87.6726,42.0190],[-87.6534,41.9399],[-87.6528,41.9254],[-87.6390,41.9107],[-87.6357,41.8965],[-87.6338,41.8887],[-87.6338,41.8829],[-87.6318,41.8768],[-87.6279,41.8768],[-87.6261,41.8794],[-87.6278,41.8858],[-87.6318,41.8858]] },
+        { id: "y", color: "#f9e300", trains: 1, coords: [[-87.7519,42.0387],[-87.7474,42.0266],[-87.6726,42.0190]] }
+      ],
+      junctions: [
+        { id: "mw", name: "Michigan / Wacker", lngLat: [-87.6244,41.8877], base: 3400 },
+        { id: "sm", name: "State / Madison", lngLat: [-87.6278,41.8819], base: 2600 },
+        { id: "cm", name: "Congress / Michigan", lngLat: [-87.6243,41.8757], base: 3100 },
+        { id: "chm", name: "Chicago / Michigan", lngLat: [-87.6244,41.8968], base: 2900 },
+        { id: "hm", name: "Halsted / Madison", lngLat: [-87.6470,41.8816], base: 1900 },
+        { id: "lr", name: "Lake Shore / Randolph", lngLat: [-87.6222,41.8843], base: 4200 }
+      ]
+    },
+    nyc: {
+      name: "New York", tz: "America/New_York", tzLabel: "ET",
+      cam: { center: [-73.9860, 40.7520], zoom: 15.4, pitch: 66, bearing: -25 },
+      corridors: [
+        { id: "broadway", coords: [[-74.0018,40.7192],[-73.9962,40.7253],[-73.9899,40.7349],[-73.9885,40.7424],[-73.9877,40.7496],[-73.9873,40.7559],[-73.9819,40.7680]] },
+        { id: "fifth", coords: [[-73.9954,40.7320],[-73.9891,40.7410],[-73.9827,40.7500],[-73.9765,40.7590],[-73.9730,40.7645]] },
+        { id: "fortysecond", coords: [[-74.0009,40.7601],[-73.9899,40.7577],[-73.9852,40.7541],[-73.9772,40.7518],[-73.9690,40.7490]] },
+        { id: "park", coords: [[-73.9772,40.7518],[-73.9722,40.7587],[-73.9664,40.7666],[-73.9606,40.7745]] },
+        { id: "canal", coords: [[-74.0110,40.7218],[-74.0018,40.7192],[-73.9962,40.7167],[-73.9908,40.7143]] },
+        { id: "fdr", coords: [[-73.9754,40.7107],[-73.9718,40.7300],[-73.9720,40.7398],[-73.9660,40.7530],[-73.9585,40.7645]] },
+        { id: "westside", coords: [[-74.0154,40.7040],[-74.0130,40.7150],[-74.0110,40.7260],[-74.0085,40.7400],[-74.0011,40.7570]] },
+        { id: "thirtyfourth", coords: [[-74.0008,40.7563],[-73.9935,40.7532],[-73.9877,40.7496],[-73.9800,40.7464],[-73.9723,40.7433]] }
+      ],
+      lines: [
+        { id: "123", color: "#ee352e", trains: 5, coords: [[-73.9397,40.8404],[-73.9625,40.8082],[-73.9722,40.7939],[-73.9819,40.7785],[-73.9873,40.7559],[-73.9910,40.7506],[-74.0027,40.7374],[-74.0091,40.7150],[-74.0135,40.7018]] },
+        { id: "456", color: "#00933c", trains: 5, coords: [[-73.9376,40.8043],[-73.9557,40.7794],[-73.9672,40.7625],[-73.9772,40.7518],[-73.9899,40.7349],[-73.9970,40.7255],[-74.0041,40.7131],[-74.0141,40.7048]] },
+        { id: "7", color: "#b933ad", trains: 3, coords: [[-73.9873,40.7559],[-73.9772,40.7518],[-73.9538,40.7426],[-73.9401,40.7508],[-73.8914,40.7469],[-73.8306,40.7596]] },
+        { id: "ace", color: "#0039a6", trains: 4, coords: [[-73.9524,40.8111],[-73.9718,40.7844],[-73.9818,40.7682],[-73.9899,40.7573],[-74.0006,40.7405],[-74.0093,40.7143],[-73.9905,40.6994],[-73.9873,40.6923]] },
+        { id: "bdfm", color: "#ff6319", trains: 4, coords: [[-73.9812,40.7589],[-73.9877,40.7496],[-73.9962,40.7376],[-74.0003,40.7323],[-73.9962,40.7253],[-73.9939,40.7183],[-73.9818,40.6907]] },
+        { id: "nqrw", color: "#fccc0a", trains: 4, coords: [[-73.9807,40.7645],[-73.9873,40.7559],[-73.9877,40.7496],[-73.9899,40.7349],[-74.0018,40.7192],[-74.0130,40.7030],[-73.9779,40.6841]] },
+        { id: "l", color: "#a7a9ac", trains: 3, coords: [[-74.0028,40.7397],[-73.9899,40.7349],[-73.9817,40.7308],[-73.9567,40.7172],[-73.9223,40.6996],[-73.9114,40.6995]] },
+        { id: "g", color: "#6cbe45", trains: 2, coords: [[-73.9432,40.7470],[-73.9542,40.7313],[-73.9512,40.7141],[-73.9660,40.6890],[-73.9908,40.6861]] }
+      ],
+      junctions: [
+        { id: "ts", name: "Times Square · B'way / 42nd", lngLat: [-73.9873,40.7559], base: 3800 },
+        { id: "hs", name: "Herald Sq · B'way / 34th", lngLat: [-73.9877,40.7496], base: 3300 },
+        { id: "gc", name: "Grand Central · 42nd / Park", lngLat: [-73.9772,40.7518], base: 3600 },
+        { id: "cc", name: "Columbus Circle", lngLat: [-73.9819,40.7680], base: 3500 },
+        { id: "cb", name: "Canal / Broadway", lngLat: [-74.0018,40.7192], base: 2800 },
+        { id: "us", name: "Union Square", lngLat: [-73.9899,40.7349], base: 2500 }
+      ]
+    },
+    la: {
+      name: "Los Angeles", tz: "America/Los_Angeles", tzLabel: "PT",
+      cam: { center: [-118.4300, 34.0150], zoom: 12.4, pitch: 58, bearing: -18 },
+      corridors: [], lines: [], junctions: [{ id: "la0", name: "Santa Monica", lngLat: [-118.4912, 34.0195], base: 2000 }]
+    },
+    sf: {
+      name: "San Francisco", tz: "America/Los_Angeles", tzLabel: "PT",
+      cam: { center: [-122.4030, 37.7870], zoom: 14.6, pitch: 58, bearing: -18 },
+      corridors: [
+        { id: "market", coords: [[-122.3944,37.7955],[-122.3990,37.7911],[-122.4014,37.7890],[-122.4058,37.7853],[-122.4090,37.7826],[-122.4135,37.7789],[-122.4194,37.7749],[-122.4250,37.7706],[-122.4310,37.7660]] },
+        { id: "vanness", coords: [[-122.4212,37.8022],[-122.4210,37.7950],[-122.4212,37.7855],[-122.4206,37.7790],[-122.4194,37.7749],[-122.4190,37.7700]] },
+        { id: "embarcadero", coords: [[-122.3880,37.7830],[-122.3905,37.7895],[-122.3944,37.7955],[-122.3985,37.8012],[-122.4055,37.8068],[-122.4135,37.8078]] },
+        { id: "mission", coords: [[-122.3935,37.7925],[-122.3990,37.7876],[-122.4060,37.7820],[-122.4130,37.7760],[-122.4190,37.7715],[-122.4250,37.7670]] },
+        { id: "geary", coords: [[-122.4035,37.7870],[-122.4100,37.7862],[-122.4180,37.7857],[-122.4212,37.7855],[-122.4300,37.7848],[-122.4420,37.7840]] },
+        { id: "folsom", coords: [[-122.3910,37.7890],[-122.3970,37.7845],[-122.4040,37.7788],[-122.4110,37.7732],[-122.4170,37.7685]] },
+        { id: "third", coords: [[-122.4050,37.7900],[-122.4020,37.7875],[-122.3995,37.7853],[-122.3960,37.7820],[-122.3915,37.7782],[-122.3892,37.7748]] },
+        { id: "columbus", coords: [[-122.4045,37.7940],[-122.4082,37.7975],[-122.4118,37.8010],[-122.4158,37.8048]] }
+      ],
+      lines: [
+        { id: "bart", color: "#0099d8", trains: 5, coords: [[-122.4690,37.7210],[-122.4470,37.7350],[-122.4330,37.7500],[-122.4194,37.7749],[-122.4090,37.7826],[-122.4014,37.7890],[-122.3944,37.7955],[-122.3700,37.8000],[-122.3300,37.8030],[-122.2710,37.8045]] },
+        { id: "n", color: "#005b95", trains: 4, coords: [[-122.5090,37.7602],[-122.4780,37.7614],[-122.4550,37.7632],[-122.4430,37.7652],[-122.4330,37.7692],[-122.4250,37.7706],[-122.4194,37.7749],[-122.4090,37.7826],[-122.3944,37.7955],[-122.3900,37.7860],[-122.3890,37.7790],[-122.3925,37.7760]] },
+        { id: "t", color: "#d31245", trains: 4, coords: [[-122.3944,37.7955],[-122.3900,37.7860],[-122.3890,37.7790],[-122.3880,37.7700],[-122.3900,37.7600],[-122.3920,37.7480],[-122.3930,37.7350],[-122.3950,37.7220],[-122.3940,37.7080]] },
+        { id: "j", color: "#f5a623", trains: 3, coords: [[-122.4340,37.7320],[-122.4280,37.7420],[-122.4272,37.7530],[-122.4280,37.7630],[-122.4268,37.7692],[-122.4250,37.7706],[-122.4194,37.7749],[-122.4090,37.7826],[-122.3944,37.7955]] },
+        { id: "l", color: "#8e44ad", trains: 3, coords: [[-122.5070,37.7400],[-122.4850,37.7432],[-122.4640,37.7452],[-122.4510,37.7520],[-122.4430,37.7600],[-122.4330,37.7692],[-122.4250,37.7706],[-122.4194,37.7749],[-122.4090,37.7826],[-122.3944,37.7955]] },
+        { id: "km", color: "#009b3a", trains: 3, coords: [[-122.4520,37.7230],[-122.4480,37.7320],[-122.4430,37.7420],[-122.4400,37.7500],[-122.4340,37.7600],[-122.4268,37.7692],[-122.4194,37.7749],[-122.4090,37.7826],[-122.3944,37.7955]] },
+        { id: "ph", color: "#8b1a1a", trains: 2, coords: [[-122.4074,37.7846],[-122.4084,37.7900],[-122.4100,37.7950],[-122.4150,37.7992],[-122.4200,37.8035],[-122.4230,37.8060]] },
+        { id: "cal", color: "#6b4423", trains: 2, coords: [[-122.3960,37.7935],[-122.4030,37.7925],[-122.4110,37.7915],[-122.4180,37.7908],[-122.4260,37.7900],[-122.4320,37.7895]] }
+      ],
+      junctions: [
+        { id: "em", name: "Embarcadero / Market", lngLat: [-122.3944,37.7955], base: 3500 },
+        { id: "mm", name: "Market / Montgomery", lngLat: [-122.4014,37.7890], base: 3200 },
+        { id: "m5", name: "Market / 5th", lngLat: [-122.4090,37.7826], base: 2900 },
+        { id: "mv", name: "Market / Van Ness", lngLat: [-122.4194,37.7749], base: 2700 },
+        { id: "vg", name: "Van Ness / Geary", lngLat: [-122.4212,37.7855], base: 3100 },
+        { id: "tf", name: "Third / Folsom", lngLat: [-122.3970,37.7845], base: 2400 }
+      ]
+    }
+  };
+
+  _mapEl = null;
+  _map = null;
+  _vehicles = [];
+  _trains = [];
+  _jMarkers = [];
+  _metrics = {};
+  _history = {};
+
+  state = { loading: true, errorMsg: null, city: "sf", night: false, rain: false, transit: true, clock: "--:--:--", dateStr: "", selected: "em", tick: 0 };
+
+  static KW = {
+    topics: { "Product": /\bproduct\b|\bPM\b|craft/i, "Design": /design|UX|\bUI\b|figma/i, "VC": /\bVCs?\b|venture|investor|\bLPs?\b|\bfund|capital|angel/i, "AI": /\bAI\b|agent|LLM|GPT|claude|model|ML\b|inference|RAG|MCP/i, "AR / VR": /\bAR\b|\bVR\b|XR|spatial|immersive|wearable/i, "B2B": /B2B|enterprise|SaaS|GTM|sales|revenue/i, "B2C / Consumer": /consumer|B2C|brand|creator|commerce|retail/i, "Climate": /climate|energy|sustainab|carbon|solar|watts/i, "Creators": /creator|content|film|story|music|art|creative/i, "Crypto / Web3": /crypto|web3|onchain|blockchain|token|stablecoin|defi|ethereum|solana|bitcoin/i, "Cybersecurity": /secur|cyber|privacy|identity/i, "Dev Tools": /dev|developer|code|coding|engineer|API|open.source|builder/i, "Fintech": /fintech|finance|payment|bank|stripe|ramp|capital|money/i, "Hardware": /hardware|device|chip|robot|physical/i, "Health / Bio": /health|bio|drug|medic|clinic|wellness|longevity/i, "Robotics": /robot|autonomous|drone/i, "SaaS": /SaaS|software|platform|cloud/i },
+    types: { "Breakfast, Brunch or Lunch": /breakfast|brunch|lunch|coffee|matcha|bagel|morning/i, "Dinner": /dinner|supper/i, "Experiential": /run|walk|ride|plunge|rave|padel|yoga|hike|sail|tour|pop.?up|workout/i, "Hackathon": /hack/i, "Happy Hour": /happy hour|drinks|brews|cocktail|wine|beer|bar\b/i, "Matchmaking": /match|speed|dating|meet the/i, "Networking": /network|mixer|meetup|social|connect|founders/i, "Panel / Fireside Chat": /panel|fireside|chat|talk|conversation|keynote|summit|forum/i, "Party": /party|rave|celebrat|night|kickoff/i, "Pitch / Demo": /pitch|demo|showcase/i, "Workshop": /workshop|build|hands.on|masterclass|teardown/i, "Wellness": /wellness|yoga|meditat|plunge|sauna|run|mindful/i }
+  };
+
+  _matches(e, gid, lab) {
+    if (gid === "hood") return e.hood === lab;
+    if (gid === "time") {
+      const m = /(\d+):(\d+)(am|pm)/.exec(e.time || ""); if (!m) return false;
+      const hr = (+m[1] % 12) + (m[3] === "pm" ? 12 : 0);
+      return lab === "Morning" ? hr < 11 : lab === "Noon" ? hr >= 11 && hr < 14 : lab === "Afternoon" ? hr >= 14 && hr < 17 : hr >= 17;
+    }
+    const re = (Component.KW[gid] || {})[lab];
+    return re ? re.test(e.title + " " + e.host) : false;
+  }
+
+  static DAYC = { Mon: "#0a84ff", Tue: "#30d158", Wed: "#ff9f0a", Thu: "#bf5af2", Fri: "#ff375f", Sat: "#ffd60a", Sun: "#64d2ff" };
+  static HOODS = {"SOMA":[-122.4005,37.7785],"FiDi (SF)":[-122.4,37.7946],"Downtown (SF)":[-122.406,37.788],"Marina":[-122.437,37.803],"Mission Bay":[-122.3915,37.7705],"Embarcadero":[-122.3935,37.796],"Salesforce Park":[-122.3965,37.7895],"Jackson Square":[-122.4025,37.7968],"Rincon Hill":[-122.3925,37.786],"Golden Gate Park":[-122.469,37.7695],"Civic Center":[-122.4175,37.7795],"Dogpatch":[-122.3885,37.76],"Mission":[-122.419,37.76],"Union Square (SF)":[-122.4075,37.788],"Hayes Valley":[-122.4245,37.7765],"Nob Hill":[-122.415,37.793],"Mountain View":[-122.084,37.386],"Palo Alto":[-122.143,37.444],"Fisherman's Wharf":[-122.417,37.808],"San Mateo":[-122.3255,37.563],"Lower Nob Hill":[-122.414,37.788],"NOPA":[-122.442,37.7765],"South Beach":[-122.39,37.782],"Pacific Heights":[-122.435,37.7925],"Duboce Triangle":[-122.433,37.768],"Alamo Square":[-122.4345,37.7765],"Presidio Heights":[-122.454,37.788],"Castro":[-122.435,37.761],"North Beach":[-122.41,37.8005],"Stanford":[-122.17,37.4275],"Telegraph Hill":[-122.406,37.802],"Panhandle":[-122.446,37.7725],"East Bay":[-122.271,37.8045],"Potrero Hill":[-122.401,37.759],"Haight Ashbury":[-122.447,37.77],"Chinatown":[-122.4065,37.794],"Russian Hill":[-122.418,37.801],"Hillsborough":[-122.354,37.56],"Cow Hollow":[-122.436,37.798],"Design District":[-122.403,37.768],"Ocean Beach":[-122.51,37.76],"Lower Haight":[-122.431,37.772]};
+
+  static SPINES = {"Embarcadero":[[-122.3918,37.7862],[-122.395,37.7922],[-122.3972,37.7958],[-122.4008,37.7998],[-122.4048,37.8028]],"Fisherman's Wharf":[[-122.4205,37.8062],[-122.416,37.8063],[-122.4118,37.8058]],"South Beach":[[-122.3938,37.7835],[-122.3946,37.7812],[-122.393,37.7792]],"Mission Bay":[[-122.3955,37.7722],[-122.3918,37.7695],[-122.3922,37.7662]],"Marina":[[-122.445,37.8008],[-122.4372,37.8003],[-122.4305,37.8008]],"Ocean Beach":[[-122.5068,37.7705],[-122.5062,37.76]],"Dogpatch":[[-122.3895,37.7612],[-122.3902,37.7572]],"FiDi (SF)":[[-122.4035,37.7925],[-122.401,37.7942],[-122.399,37.7918]],"Rincon Hill":[[-122.3938,37.7866],[-122.3966,37.7853]],"Salesforce Park":[[-122.3975,37.79],[-122.3955,37.7888]],"East Bay":[[-122.273,37.804],[-122.268,37.807]],"Golden Gate Park":[[-122.482,37.7697],[-122.465,37.77],[-122.456,37.7705]],"Jackson Square":[[-122.4035,37.7965],[-122.4012,37.7968]],"Telegraph Hill":[[-122.4075,37.8018],[-122.4062,37.8008]],"North Beach":[[-122.4095,37.7998],[-122.413,37.801]],"Russian Hill":[[-122.4195,37.8008],[-122.4172,37.7988]],"Chinatown":[[-122.4065,37.7935],[-122.407,37.7958]]};
+  static WATERFRONT = ["Embarcadero","Fisherman's Wharf","South Beach","Mission Bay","Marina","Ocean Beach","Dogpatch","Rincon Hill","Salesforce Park","Jackson Square","Telegraph Hill"];
+
+  static hashStr(s) { let x = 2166136261; for (let i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0) / 4294967295; }
+
+  // Place each event on land: a point along the neighborhood's inland street spine, jittered a short distance. Cached per event.
+  static GEO_LA = { HOODS: {"Santa Monica":[-118.488,34.02],"West Hollywood":[-118.3617,34.09],"Venice":[-118.467,33.99],"Mid City":[-118.35,34.045],"Playa del Rey":[-118.435,33.959],"Playa Vista":[-118.423,33.976],"El Segundo":[-118.41,33.9195],"Beverly Hills":[-118.4004,34.0696],"Downtown (LA)":[-118.2515,34.05],"Century City":[-118.417,34.057],"Arts District":[-118.234,34.04],"Brentwood":[-118.476,34.055],"Culver City":[-118.396,34.021],"USC":[-118.285,34.0224],"Hollywood":[-118.328,34.098],"Inglewood":[-118.353,33.9617],"Marina del Rey":[-118.441,33.983],"Sunset":[-118.37,34.096],"Long Beach":[-118.19,33.7765],"South LA":[-118.29,33.99],"Hawthorne":[-118.3526,33.9164],"East LA":[-118.172,34.0239],"Windsor Hills":[-118.353,33.988],"Echo Park":[-118.26,34.078],"Pasadena":[-118.1445,34.1478],"Westwood":[-118.445,34.059],"UCLA":[-118.4452,34.0689],"Westside":[-118.43,34.035],"Bel Air":[-118.459,34.083],"West Adams":[-118.32,34.033],"Koreatown":[-118.3009,34.0618],"Hollywood Hills":[-118.335,34.115],"The Valley":[-118.448,34.16],"Torrance":[-118.3406,33.8358],"Burbank":[-118.309,34.1808],"Pacific Palisades":[-118.526,34.048],"Malibu":[-118.687,34.04],"Los Feliz":[-118.287,34.107],"Carson":[-118.262,33.8317]}, SPINES: {"Santa Monica":[[-118.4935,34.0175],[-118.487,34.0215],[-118.479,34.0255]],"Venice":[[-118.47,33.993],[-118.464,33.9868]],"Marina del Rey":[[-118.443,33.986],[-118.439,33.98]],"Downtown (LA)":[[-118.2575,34.047],[-118.247,34.053]],"El Segundo":[[-118.416,33.919],[-118.4,33.92]],"Culver City":[[-118.4,34.023],[-118.39,34.019]]}, WF: ["Santa Monica","Venice","Marina del Rey","Playa del Rey","Malibu","Long Beach","Pacific Palisades"] };
+  static META = {
+    sf: { short: "SF", title: "SF Tech Week Map'26", range: "Oct 5–11", desc: "Explore San Francisco events Oct 5‑11 on an interactive 3D map. Filter by day and topic, then build your week's itinerary.", file: "./sf-events.json", key: "sftw-plan-v1" },
+    la: { short: "LA", title: "LA Tech Week Map'26", range: "Oct 12–18", desc: "Explore Los Angeles events Oct 12‑18 on an interactive 3D map. Filter by day and topic, then build your week's itinerary.", file: "./la-events.json", key: "latw-plan-v1" }
+  };
+  _meta() { return Component.META[this.state.city] || Component.META.sf; }
+  _geo() { return this.state.city === "la" ? Component.GEO_LA : { HOODS: Component.HOODS, SPINES: Component.SPINES, WF: Component.WATERFRONT }; }
+  _week() { return this.state.city === "la" ? { Mon: "OCT 12", Tue: "OCT 13", Wed: "OCT 14", Thu: "OCT 15", Fri: "OCT 16", Sat: "OCT 17", Sun: "OCT 18" } : Component.WEEK; }
+
+  _hoodList() {
+    if (!this._events) return [];
+    if (this._hoodCache && this._hoodCache.src === this._events) return this._hoodCache.list;
+    const set = [...new Set(this._events.map(e => e.hood).filter(x => x && x !== "Other"))].sort((a, b) => a.localeCompare(b));
+    const list = set.concat(this._events.some(e => e.hood === "Other") ? ["Other"] : []);
+    this._hoodCache = { src: this._events, list };
+    return list;
+  }
+
+  _loadCity(city, fromHash) {
+    const M = Component.META[city];
+    this._events = null; this._evSig = null;
+    return fetch(M.file).then(r => r.json()).then(d => {
+      if (this.state.city !== city) return;
+      d.forEach((e, i) => { e.id = i; });
+      this._events = d;
+      let plan = [];
+      const m = fromHash ? /plan=([\d.]+)/.exec(location.hash || "") : null;
+      if (m) plan = m[1].split(".").map(Number).filter(n => d[n]);
+      else { try { plan = (JSON.parse(localStorage.getItem(M.key) || "[]") || []).filter(n => d[n]); } catch (e) {} }
+      if (m && plan.length) { this.setState({ plan, tab: "plan" }); this._toast("Opened a shared plan"); } else this.setState({ plan });
+      if (!fromHash) { const cam = this._city().cam; if (this._map) this._map.flyTo({ center: cam.center, zoom: cam.zoom, pitch: cam.pitch, bearing: cam.bearing, duration: 3200, curve: 1.6, essential: true }); }
+    }).catch(() => { this._events = []; this.forceUpdate(); });
+  }
+
+  _switchTo(city) {
+    if (this.state.city === city) return;
+    if (this._popup) { this._popup.remove(); this._popup = null; }
+    this.setState({ city, day: "All", filters: {}, query: "", gap: null, plan: [], limit: 40, nudge: null, openGroups: {} }, () => this._loadCity(city, false));
+  }
+
+  _pos(e) {
+    if (e._xy !== undefined) return e._xy;
+    const G = this._geo();
+    const spine = G.SPINES[e.hood] || (G.HOODS[e.hood] ? [G.HOODS[e.hood]] : null);
+    if (!spine) return (e._xy = null);
+    const hash = Component.hashStr, key = e.url || e.title || String(e.id);
+    let base;
+    if (spine.length === 1) base = spine[0];
+    else {
+      const u = hash(key + "s") * (spine.length - 1), k = Math.min(spine.length - 2, Math.floor(u)), t = u - k;
+      base = [spine[k][0] + (spine[k + 1][0] - spine[k][0]) * t, spine[k][1] + (spine[k + 1][1] - spine[k][1]) * t];
+    }
+    const maxR = G.WF.includes(e.hood) ? 0.00045 : spine.length > 1 ? 0.0009 : 0.0016;
+    const a = hash(key) * Math.PI * 2, r = Math.sqrt(hash(key + "r")) * maxR;
+    const lngScale = 1 / Math.cos(base[1] * Math.PI / 180);
+    return (e._xy = [base[0] + Math.cos(a) * r * lngScale, base[1] + Math.sin(a) * r]);
+  }
+
+  _when(e) { return e.day + ", " + e.date.charAt(0) + e.date.slice(1, 3).toLowerCase() + e.date.slice(3) + " · " + (this._tba(e) ? "Time TBA" : e.time); }
+
+  _eventFC(list) {
+    const feats = [];
+    for (const e of list) {
+      const xy = this._pos(e); if (!xy) continue;
+      feats.push({ type: "Feature", properties: { id: e.id, day: e.day, title: e.title, host: e.host, hood: e.hood, when: this._when(e), url: e.url }, geometry: { type: "Point", coordinates: xy } });
+    }
+    return { type: "FeatureCollection", features: feats };
+  }
+
+  // ---------- itinerary ----------
+  static WD = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
+  static WEEK = { Mon: "OCT 5", Tue: "OCT 6", Wed: "OCT 7", Thu: "OCT 8", Fri: "OCT 9", Sat: "OCT 10", Sun: "OCT 11" };
+  static AUTO_THEMES = ["AI", "Founders", "VC", "Crypto / Web3", "Climate", "Dev Tools", "Fintech", "Health / Bio", "Robotics", "Hardware", "Creators", "B2B", "Design", "Product"];
+
+  _mins(t) { const m = /(\d+):(\d+)\s*(am|pm)/i.exec(t || ""); if (!m) return 9 * 60; return (+m[1] % 12) * 60 + (+m[2]) + (m[3].toLowerCase() === "pm" ? 720 : 0); }
+  _fmt(m) { if (m == null) return "TBA"; m = Math.max(0, Math.min(1439, Math.round(m))); const hh = Math.floor(m / 60), mm = m % 60, ap = hh >= 12 ? "pm" : "am"; return (hh % 12 || 12) + (mm ? ":" + String(mm).padStart(2, "0") : "") + ap; }
+  _dur(e) { const t = e.title || ""; return /hack/i.test(t) ? 180 : /dinner|summit|conference/i.test(t) ? 120 : /coffee|breakfast|run\b|walk|matcha|bagel|plunge/i.test(t) ? 60 : 90; }
+  _dnum(e) { return parseInt(String(e.date).split(" ")[1], 10) || 0; }
+  _dateLabel(e) { return (Component.WD[e.day] || e.day) + ", Oct " + this._dnum(e); }
+
+  _travel(a, b) {
+    const pa = this._pos(a), pb = this._pos(b);
+    if (!pa || !pb) return { min: 20, label: "~20 min travel", walk: false, km: 0 };
+    const R = 6371, t = Math.PI / 180, dLat = (pb[1] - pa[1]) * t, dLng = (pb[0] - pa[0]) * t;
+    const q = Math.sin(dLat / 2) ** 2 + Math.cos(pa[1] * t) * Math.cos(pb[1] * t) * Math.sin(dLng / 2) ** 2;
+    const km = 2 * R * Math.asin(Math.sqrt(q)) * 1.3;
+    if (km <= 1.4) { const min = Math.max(3, Math.round(km / 4.8 * 60)); return { min, label: min + " min walk", walk: true, km }; }
+    const min = Math.round(6 + km / 24 * 60); return { min, label: min + " min drive", walk: false, km };
+  }
+
+  _planIds() { return this.state.plan || []; }
+
+  _setPlan(ids, extra) {
+    this.setState({ plan: ids, ...(extra || {}) });
+    try { localStorage.setItem(this._meta().key, JSON.stringify(ids)); } catch (e) {}
+  }
+
+  _togglePlan(id) {
+    const ids = this._planIds();
+    const has = ids.includes(id);
+    const next = has ? ids.filter(x => x !== id) : ids.concat([id]);
+    let extra = {};
+    if (!has && (next.length === 3 || next.length === 6)) {
+      const e = this._events[id];
+      extra.nudge = { kind: "download", date: e.date, text: "You've saved " + next.length + " events. Download your " + (Component.WD[e.day] || e.day) + " plan?", cta: "Download" };
+    }
+    this._setPlan(next, extra);
+    if (!has) this._toast("Added to your plan");
+  }
+
+  _toast(t) { clearTimeout(this._toastT); this.setState({ toast: t }); this._toastT = setTimeout(() => this.setState({ toast: null }), 2200); }
+
+  _planGroups() {
+    const E = this._events || [];
+    const byDate = {};
+    for (const id of this._planIds()) { const e = E[id]; if (e) (byDate[e.date] = byDate[e.date] || []).push(e); }
+    const hm = this._home();
+    return Object.keys(byDate).sort((a, b) => parseInt(a.split(" ")[1]) - parseInt(b.split(" ")[1])).map(date => {
+      const key = (e) => this._tba(e) ? 5000 : this._mins(e.time);
+      const evs = byDate[date].slice().sort((a, b) => key(a) - key(b));
+      const items = evs.map((e, k) => { const tba = this._tba(e), st = tba ? null : this._mins(e.time); return { e, n: k + 1, st, en: tba ? null : st + this._dur(e), tba }; });
+      items.forEach((it, k) => {
+        if (!k) return;
+        const prev = items[k - 1];
+        it.leg = this._leg(prev.e, it.e);
+        if (it.tba || prev.tba) return;
+        it.gapMin = it.st - prev.en;
+        it.conflict = it.st < prev.en;
+        it.tight = !it.conflict && it.gapMin < it.leg.min;
+        it.open = !it.conflict && it.gapMin - it.leg.min >= 90 ? { from: prev.en, to: it.st - it.leg.min, near: prev.e } : null;
+      });
+      const timed = items.filter(x => !x.tba), last = timed[timed.length - 1];
+      const tail = last && last.en <= 19 * 60 ? { from: last.en, to: 22 * 60, near: last.e } : null;
+      const first = items.find(x => !this._isVirtual(x.e) && this._pos(x.e));
+      const homeLeg = hm && first ? this._legFrom(hm.xy, first.e) : null;
+      return { date, day: evs[0].day, items, tail, homeLeg, homeFirst: first };
+    });
+  }
+
+  _gapLabel(from, to) {
+    const m = to - from, hh = Math.floor(m / 60), mm = Math.round((m % 60) / 15) * 15;
+    return (hh ? hh + "h" : "") + (mm ? " " + mm + "m" : "") + " open, " + this._fmt(from) + " to " + this._fmt(to);
+  }
+
+  _fillGap(g, date, day) {
+    const near = this._pos(g.near);
+    this.setState({ gap: { date, day, from: g.from, to: g.to, near }, tab: "events", day, limit: 40 });
+  }
+
+  _gapList(g) {
+    const planSet = new Set(this._planIds());
+    const d = (e) => { const p = this._pos(e); if (!p || !g.near) return 99; return Math.hypot((p[0] - g.near[0]) * 0.79, p[1] - g.near[1]); };
+    return (this._events || []).filter(e => e.date === g.date && !planSet.has(e.id) && this._mins(e.time) >= g.from - 10 && this._mins(e.time) + this._dur(e) <= g.to + 30)
+      .sort((a, b) => d(a) - d(b));
+  }
+
+  _autoPlan(date, themes) {
+    const E = this._events || [], ids = this._planIds(), planSet = new Set(ids);
+    const fixed = ids.map(id => E[id]).filter(e => e && e.date === date);
+    const res = themes.map(t => t === "Founders" ? /founder/i : t === "VC" ? /\bVCs?\b|investor|capital|fund|venture/i : (Component.KW.topics || {})[t]).filter(Boolean);
+    const clash = (a, b) => { const as = this._mins(a.time), bs = this._mins(b.time); return as < bs + this._dur(b) + 10 && bs < as + this._dur(a) + 10; };
+    const cands = E.filter(e => e.date === date && !planSet.has(e.id) && this._pos(e) && this._mins(e.time) >= 7 * 60 && this._mins(e.time) <= 21 * 60 &&
+      (!res.length || res.some(r => r.test(e.title + " " + e.host))) && !fixed.some(f => clash(e, f)));
+    const picked = []; let t = 8 * 60, prev = null;
+    while (picked.length < 5) {
+      let best = null, bs = Infinity;
+      for (const c of cands) {
+        if (picked.includes(c)) continue;
+        const st = this._mins(c.time), tr = prev ? this._travel(prev, c).min : 0;
+        if (st < t + tr) continue;
+        const sc = (st - t) + tr * 2.5;
+        if (sc < bs) { bs = sc; best = c; }
+      }
+      if (!best) break;
+      picked.push(best); prev = best; t = this._mins(best.time) + this._dur(best);
+    }
+    return picked;
+  }
+
+  _runAuto() {
+    const day = this.state.autoDay || "Tue", date = this._week()[day];
+    const themes = Object.keys(this.state.autoThemes || {}).filter(k => this.state.autoThemes[k]);
+    const picked = this._autoPlan(date, themes);
+    if (!picked.length) return this._toast("No matching events that day. Try fewer themes.");
+    this._setPlan(this._planIds().concat(picked.map(e => e.id)), {
+      autoOpen: false, gap: null,
+      nudge: { kind: "download", date, text: "Your " + Component.WD[day] + " plan is ready: " + picked.length + " events. Download it?", cta: "Download" }
+    });
+    this._toast("Added " + picked.length + " events to " + Component.WD[day]);
+    setTimeout(() => this._framePlan(date), 60);
+  }
+
+  _framePlan(date) {
+    const map = this._map; if (!map) return;
+    const g = this._planGroups().find(x => x.date === date); if (!g) return;
+    const pts = g.items.map(it => this._pos(it.e)).filter(Boolean); if (!pts.length) return;
+    if (this.state.day !== g.day) { this._skipFrame = true; this.setState({ day: g.day }); }
+    let w = 180, e = -180, s = 90, n = -90;
+    for (const [x, y] of pts) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); }
+    const pad = 0.0025; w -= pad; e += pad; s -= pad * 0.8; n += pad * 0.8;
+    const cam = map.cameraForBounds([[w, s], [e, n]], { padding: { top: 90, bottom: 110, left: 320, right: 390 }, maxZoom: 16.4, bearing: map.getBearing() });
+    if (!cam) return;
+    if (this.state.orbit !== false) this.setState({ orbit: false });
+    setTimeout(() => map.flyTo({ center: cam.center, zoom: Math.min(cam.zoom, 16.4), pitch: 58, bearing: map.getBearing() + 15, duration: 2400, curve: 1.3, easing: t => 1 - Math.pow(1 - t, 3), essential: true }), 30);
+  }
+
+  _addPlanLayers() {
+    const map = this._map;
+    if (map.getSource("plan-pts")) return;
+    const font = (map.getStyle().layers.find(l => l.type === "symbol" && l.layout && l.layout["text-font"]) || {}).layout?.["text-font"] || ["Open Sans Regular"];
+    const dayC = this._dayColorExpr();
+    map.addSource("plan-route", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addSource("plan-pts", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "plan-route-casing", type: "line", source: "plan-route", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-width": 7, "line-opacity": 0.85 } });
+    map.addLayer({ id: "plan-route-drive", type: "line", source: "plan-route", filter: ["!", ["get", "walk"]], layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": dayC, "line-width": 4 } });
+    map.addLayer({ id: "plan-route-walk", type: "line", source: "plan-route", filter: ["get", "walk"], layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": dayC, "line-width": 4, "line-dasharray": [1.2, 1.4] } });
+    map.addLayer({ id: "plan-route-label", type: "symbol", source: "plan-route", layout: { "symbol-placement": "line-center", "text-field": ["get", "label"], "text-font": font, "text-size": 12, "text-allow-overlap": true, "text-offset": [0, -1] }, paint: { "text-color": "#111111", "text-halo-color": "#ffffff", "text-halo-width": 2.2 } });
+    map.addLayer({ id: "plan-ring", type: "circle", source: "plan-pts", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 8, 16, 13], "circle-color": "#ffffff", "circle-stroke-color": dayC, "circle-stroke-width": 3.5 } });
+    map.addLayer({ id: "plan-num", type: "symbol", source: "plan-pts", layout: { "text-field": ["to-string", ["get", "n"]], "text-font": font, "text-size": 12, "text-allow-overlap": true, "text-ignore-placement": true }, paint: { "text-color": "#111111" } });
+    if (!this._planBound) {
+      this._planBound = true;
+      map.on("click", "plan-ring", (ev) => this._onEvClick(ev));
+      map.on("mouseenter", "plan-ring", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "plan-ring", () => { map.getCanvas().style.cursor = ""; });
+    }
+    this._planSig = null;
+    this._syncPlan();
+  }
+
+  _syncPlan() {
+    const map = this._map;
+    if (!map || !this._loaded || !this._events) return;
+    const src = map.getSource("plan-pts"), rsrc = map.getSource("plan-route");
+    if (!src || !rsrc) return;
+    const sig = this.state.city + "|" + this._events.length + "|" + JSON.stringify(this._planIds()) + "|" + (this.state.day || "All") + "|" + JSON.stringify(this._home()) + this._mode();
+    if (sig === this._planSig && src === this._planSrc) return;
+    this._planSig = sig; this._planSrc = src;
+    const day = this.state.day || "All";
+    const pts = [], legs = [];
+    for (const g of this._planGroups()) {
+      if (day !== "All" && g.day !== day) continue;
+      { const hx = this._home(); if (hx && g.homeLeg && g.homeFirst) { const fxy = this._pos(g.homeFirst.e); if (fxy) legs.push({ type: "Feature", properties: { day: g.day, walk: g.homeLeg.walk, label: g.homeLeg.label }, geometry: { type: "LineString", coordinates: [hx.xy, fxy] } }); } }
+      g.items.forEach((it, k) => {
+        const xy = this._pos(it.e); if (!xy) return;
+        pts.push({ type: "Feature", properties: { id: it.e.id, n: it.n, day: it.e.day, title: it.e.title, host: it.e.host, hood: it.e.hood, when: this._when(it.e), url: it.e.url }, geometry: { type: "Point", coordinates: xy } });
+        if (k) { const pxy = this._pos(g.items[k - 1].e); if (pxy) legs.push({ type: "Feature", properties: { day: it.e.day, walk: it.leg.walk, label: it.leg.label }, geometry: { type: "LineString", coordinates: [pxy, xy] } }); }
+      });
+    }
+    src.setData({ type: "FeatureCollection", features: pts });
+    rsrc.setData({ type: "FeatureCollection", features: legs });
+  }
+
+  static HOME_SPOTS = {
+    sf: { "SOMA": [-122.4005, 37.7785], "FiDi": [-122.3999, 37.7946], "Mission": [-122.4194, 37.7599], "Marina": [-122.4368, 37.8030], "Hayes Valley": [-122.4250, 37.7765], "Union Square": [-122.4075, 37.7880] },
+    la: { "Santa Monica": [-118.4912, 34.0195], "Venice": [-118.4695, 33.9850], "Downtown LA": [-118.2437, 34.0522], "Hollywood": [-118.3287, 34.0928], "Culver City": [-118.3965, 34.0211], "Silicon Beach": [-118.4452, 33.9800] }
+  };
+  static SPEED = { walk: 5, transit: 15, drive: 20 };
+
+  _tba(e) { return /^12:00\s*am$/i.test(String(e.time || "").trim()); }
+  _isVirtual(e) { return /virtual|online/i.test(e.hood || ""); }
+  _home() { const h = (this.state.homes || {})[this.state.city === "la" ? "la" : "sf"]; return h && h.xy ? h : null; }
+  _mode() { return this.state.tmode || "walk"; }
+  _km(pa, pb) { const t = Math.PI / 180, dLat = (pb[1] - pa[1]) * t, dLng = (pb[0] - pa[0]) * t; const q = Math.sin(dLat / 2) ** 2 + Math.cos(pa[1] * t) * Math.cos(pb[1] * t) * Math.sin(dLng / 2) ** 2; return 12742 * Math.asin(Math.sqrt(q)); }
+  _minsFor(km) { return Math.max(1, Math.round(km / Component.SPEED[this._mode()] * 60)); }
+  _tlabel(min) { return "~" + min + " min " + this._mode(); }
+  _homeMin(e) { const h = this._home(); if (!h || this._isVirtual(e)) return null; const p = this._pos(e); return p ? this._minsFor(this._km(h.xy, p)) : null; }
+  _venueTravel(e) { const m = this._homeMin(e); return m == null ? "" : " · " + this._tlabel(m); }
+  _leg(a, b) {
+    if (this._isVirtual(a) || this._isVirtual(b)) return { min: 0, label: "Virtual", walk: true, km: 0 };
+    const pa = this._pos(a), pb = this._pos(b);
+    if (!pa || !pb) return { min: 0, label: "Location not listed", walk: true, km: 0 };
+    const km = this._km(pa, pb), min = this._minsFor(km);
+    return { min, label: this._tlabel(min), walk: this._mode() === "walk", km };
+  }
+  _legFrom(xy, e) { const p = this._pos(e); if (!p) return null; const min = this._minsFor(this._km(xy, p)); return { min, label: this._tlabel(min), walk: this._mode() === "walk" }; }
+  _altList(a) {
+    const planSet = new Set(this._planIds());
+    return (this._events || []).filter(e => e.date === a.date && !planSet.has(e.id) && !this._tba(e) && !this._isVirtual(e) && Math.abs(this._mins(e.time) - a.t) <= 45 && this._pos(e) && this._minsFor(this._km(a.near, this._pos(e))) <= 10)
+      .sort((x, y) => this._km(a.near, this._pos(x)) - this._km(a.near, this._pos(y)));
+  }
+  _setHome(h) {
+    const k = this.state.city === "la" ? "la" : "sf", homes = { ...(this.state.homes || {}) };
+    if (h) homes[k] = h; else delete homes[k];
+    try { localStorage.setItem("tw-homes", JSON.stringify(homes)); } catch (e) {}
+    if (h && this._map) { const mob = window.innerWidth < 820; if (this.state.orbit !== false) this.setState({ orbit: false }); this._map.easeTo({ center: h.xy, zoom: Math.max(13.6, Math.min(this._map.getZoom(), 14.6)), duration: 1400, padding: mob ? { top: 120, bottom: 120, left: 20, right: 20 } : { top: 60, bottom: 80, left: 330, right: 400 } }); }
+    this.setState({ homes, homeOpen: !h ? this.state.homeOpen : false, homeEdit: false, homeQ: "", ...(h ? { within: "20", tsort: "nearest", limit: 40 } : { within: "any", tsort: "time" }) });
+  }
+  _inCity(xy) {
+    const la = this.state.city === "la", bb = la ? [-118.95, 33.60, -117.65, 34.45] : [-122.65, 37.55, -122.15, 37.95];
+    return xy[0] >= bb[0] && xy[0] <= bb[2] && xy[1] >= bb[1] && xy[1] <= bb[3];
+  }
+  _useXY(xy, approx) {
+    const city = this.state.city === "la" ? "LA" : "SF";
+    if (!this._inCity(xy)) return this._toast("You seem to be outside " + city + ". Enter an address instead.");
+    this._setHome({ name: approx ? "Near me (approx.)" : "My location", xy });
+  }
+  _ipLocate(reason) {
+    fetch("https://ipapi.co/json/").then(r => r.json()).then(d => {
+      if (d && isFinite(+d.longitude) && isFinite(+d.latitude)) this._useXY([+d.longitude, +d.latitude], true);
+      else this._toast(reason || "Couldn't get your location. Enter an address instead.");
+    }).catch(() => this._toast(reason || "Couldn't get your location. Enter an address instead."));
+  }
+  _locate() {
+    const geo = navigator.geolocation;
+    if (!geo || !window.isSecureContext) return this._ipLocate("Location isn't available here. Enter an address instead.");
+    this._toast("Finding your location");
+    let settled = false;
+    const fail = (err) => {
+      if (settled) return; settled = true;
+      if (err && err.code === 1) this._ipLocate("Location access is blocked. Allow it in your browser settings, or enter an address.");
+      else this._ipLocate();
+    };
+    const guard = setTimeout(() => fail({ code: 3 }), 12000);
+    try {
+      geo.getCurrentPosition(p => { if (settled) return; settled = true; clearTimeout(guard); this._useXY([p.coords.longitude, p.coords.latitude], false); },
+        (err) => { clearTimeout(guard); fail(err); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+    } catch (e) { clearTimeout(guard); fail(e); }
+  }
+  _suggest(q) {
+    clearTimeout(this._sugT);
+    q = (q || "").trim();
+    if (q.length < 3) { if ((this.state.sugg || []).length) this.setState({ sugg: [] }); return; }
+    this._sugT = setTimeout(() => {
+      const la = this.state.city === "la", bb = la ? "-118.70,33.70,-117.90,34.35" : "-122.53,37.70,-122.35,37.84", c = la ? [-118.35, 34.03] : [-122.42, 37.77];
+      const tok = ++this._sugN || (this._sugN = 1);
+      fetch("https://photon.komoot.io/api/?limit=6&lang=en&q=" + encodeURIComponent(q) + "&lon=" + c[0] + "&lat=" + c[1] + "&bbox=" + bb).then(r => r.json()).then(d => {
+        if (tok !== this._sugN) return;
+        const seen = new Set();
+        const sugg = (d.features || []).map(f => { const p = f.properties || {}; const name = p.name || [p.housenumber, p.street].filter(Boolean).join(" ") || p.street || "Place"; const sub = [p.name && p.street ? [p.housenumber, p.street].filter(Boolean).join(" ") : "", p.district || p.locality, p.city].filter(Boolean).join(", "); return { name, sub, xy: f.geometry.coordinates }; })
+          .filter(g => { const k = g.name + g.sub; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 5);
+        this.setState({ sugg });
+      }).catch(() => {});
+    }, 250);
+  }
+
+  _searchAddr() {
+    const top = (this.state.sugg || [])[0];
+    if (top) { this.setState({ sugg: [] }); return this._setHome({ name: top.name.length > 18 ? top.name.slice(0, 17) + "…" : top.name, xy: top.xy }); }
+    const q = (this.state.homeQ || "").trim(); if (!q) return;
+    const city = this.state.city === "la" ? "Los Angeles, CA" : "San Francisco, CA";
+    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q + ", " + city)).then(r => r.json())
+      .then(d => { if (!d || !d[0]) return this._toast("Address not found"); this._setHome({ name: q.length > 18 ? q.slice(0, 17) + "…" : q, xy: [+d[0].lon, +d[0].lat] }); })
+      .catch(() => this._toast("Address search failed"));
+  }
+  _addHomeLayers() {
+    const map = this._map; if (!map || map.getSource("home-rings")) return;
+    const font = (map.getStyle().layers.find(l => l.type === "symbol" && l.layout && l.layout["text-font"]) || {}).layout?.["text-font"] || ["Open Sans Regular"];
+    const E = { type: "FeatureCollection", features: [] }, before = map.getLayer("events-halo") ? "events-halo" : undefined;
+    map.addSource("home-rings", { type: "geojson", data: E });
+    map.addSource("home-ring-lbl", { type: "geojson", data: E });
+    map.addLayer({ id: "home-ring-fill", type: "fill", source: "home-rings", paint: { "fill-color": "#111111", "fill-opacity": 0.045 } }, before);
+    map.addLayer({ id: "home-ring-line", type: "line", source: "home-rings", paint: { "line-color": "#111111", "line-opacity": 0.35, "line-width": 1.2, "line-dasharray": [2, 2] } }, before);
+    map.addLayer({ id: "home-ring-text", type: "symbol", source: "home-ring-lbl", layout: { "text-field": ["get", "t"], "text-font": font, "text-size": 10, "text-allow-overlap": true, "text-ignore-placement": true }, paint: { "text-color": "#111111", "text-halo-color": "#ffffff", "text-halo-width": 1.6 } });
+    this._homeSig = null;
+  }
+  _syncHome() {
+    const map = this._map; if (!map || !this._loaded || !window.maplibregl) return;
+    if (!map.getSource("home-rings")) { try { this._addHomeLayers(); } catch (e) { return; } }
+    const h = this._home(), night = !!this.state.night, md = this._mode();
+    const sig = (this.state.city || "sf") + JSON.stringify(h) + md + night;
+    if (sig === this._homeSig) return; this._homeSig = sig;
+    const ink = night ? "#ffffff" : "#111111", halo = night ? "#0a0f1c" : "#ffffff";
+    map.setPaintProperty("home-ring-fill", "fill-color", ink); map.setPaintProperty("home-ring-line", "line-color", ink);
+    map.setPaintProperty("home-ring-text", "text-color", ink); map.setPaintProperty("home-ring-text", "text-halo-color", halo);
+    const E = { type: "FeatureCollection", features: [] };
+    if (this._youMk) { this._youMk.remove(); this._youMk = null; }
+    if (!h) { map.getSource("home-rings").setData(E); map.getSource("home-ring-lbl").setData(E); return; }
+    const sp = Component.SPEED[md], feats = [], lf = [], la = h.xy[1] * Math.PI / 180;
+    for (const m of [30, 20, 10]) {
+      const r = sp * m / 60, co = [];
+      for (let i = 0; i <= 72; i++) { const a = i / 72 * Math.PI * 2; co.push([h.xy[0] + Math.cos(a) * r / (111.32 * Math.cos(la)), h.xy[1] + Math.sin(a) * r / 110.57]); }
+      feats.push({ type: "Feature", properties: { m }, geometry: { type: "Polygon", coordinates: [co] } });
+      lf.push({ type: "Feature", properties: { t: m + " min" }, geometry: { type: "Point", coordinates: [h.xy[0], h.xy[1] + r / 110.57] } });
+    }
+    map.getSource("home-rings").setData({ type: "FeatureCollection", features: feats });
+    map.getSource("home-ring-lbl").setData({ type: "FeatureCollection", features: lf });
+    const el = document.createElement("div");
+    const pin = (window.__resources && window.__resources.youPin) || "./assets/you-pin.png";
+    el.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))";
+    el.innerHTML = '<span style="padding:3px 10px;border-radius:999px;background:' + ink + ';color:' + (night ? "#111111" : "#ffffff") + ';font:700 12px \'IBM Plex Sans\',-apple-system,sans-serif;white-space:nowrap">You</span><img src="' + pin + '" alt="" style="display:block;width:34px;height:34px;' + (night ? "filter:invert(1);" : "") + '">';
+    this._youMk = new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat(h.xy).addTo(map);
+  }
+
+  _lblText(p) {
+    const m = /(\d+)(?::(\d+))?\s*(am|pm)/i.exec(p.when || ""); const t = m ? m[1] + (m[2] && m[2] !== "00" ? ":" + m[2] : "") + m[3].toLowerCase() : "";
+    let ti = String(p.title || "").split(/[|:(]/)[0].trim(); if (ti.length > 22) ti = ti.slice(0, 21).trim() + "…";
+    const tt = /TBA/.test(p.when || "") ? "TBA" : t; return (tt ? tt + " · " : "") + ti;
+  }
+
+  _lblEl(f, hover, stemH) {
+    const p = f.properties, dc = Component.DAYC[p.day] || "#191919";
+    const el = document.createElement("div");
+    el.style.cssText = "display:flex;flex-direction:column;align-items:center;cursor:pointer;pointer-events:auto;font-family:'IBM Plex Sans',-apple-system,sans-serif";
+    const pill = document.createElement("div");
+    const dk = this.state.night && window.innerWidth < 820;
+    pill.style.cssText = "display:flex;align-items:center;gap:5px;padding:3px 8px 3px 6px;border-radius:999px;background:" + (dk ? "rgba(22,24,32,0.78)" : "rgba(255,255,255,0.86)") + ";backdrop-filter:blur(12px) saturate(170%);-webkit-backdrop-filter:blur(12px) saturate(170%);border:1px solid " + (hover ? dc : (dk ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.9)")) + ";box-shadow:0 2px 8px rgba(0,0,0,0.16);color:" + (dk ? "#ffffff" : "#111") + ";font-size:10.5px;font-weight:600;line-height:1.25;white-space:nowrap";
+    pill.innerHTML = '<span style="flex:none;width:6px;height:6px;border-radius:50%;background:' + dc + '"></span><span></span>';
+    pill.lastChild.textContent = this._lblText(p);
+    const stem = document.createElement("div");
+    stem.style.cssText = "width:1px;height:" + (stemH || 8) + "px;background:" + dc;
+    el.appendChild(pill); el.appendChild(stem);
+    el.addEventListener("click", (e) => { e.stopPropagation(); this._onEvClick({ features: [f] }); });
+    return el;
+  }
+
+  _updateLabels(force) {
+    if (this.state.hideTags) { if (this._lbls) { for (const m of this._lbls.values()) m.remove(); this._lbls.clear(); } return; }
+    if (this._map && this._mapEl) { const cv = this._map.getCanvas(); if (Math.abs(cv.clientWidth - this._mapEl.clientWidth) > 1) this._map.resize(); }
+    const map = this._map; if (!map || !window.maplibregl) return;
+    this._lbls = this._lbls || new Map();
+    const fc = this._lastFC, z = map.getZoom();
+    const clear = () => { for (const m of this._lbls.values()) m.remove(); this._lbls.clear(); };
+    if (!fc || z < 12 || (window.innerWidth < 820 && this._planIds().length)) return clear();
+    const cv = map.getCanvas(), W = cv.clientWidth, H = cv.clientHeight, cr = cv.getBoundingClientRect();
+    let L = 4, Rr = W - 4, T = 50;
+    if (window.innerWidth >= 820) {
+      const pan = [...document.querySelectorAll("div")].filter(d => d.style.position === "absolute" && d.style.backdropFilter && d.offsetWidth > 200 && d.offsetHeight > 200 && getComputedStyle(d).display !== "none");
+      for (const d of pan) { const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2 - cr.left; if (cx < W / 2) L = Math.max(L, r.right - cr.left + 8); else Rr = Math.min(Rr, r.left - cr.left - 8); }
+    } else T = 120;
+    const plan = new Set(this._planIds());
+    let vis = null; try { vis = new Set(map.queryRenderedFeatures({ layers: ["events-dot"] }).map(f => String(f.properties.id))); } catch (e) {}
+    const tMin = (w) => { const m = /(\d+)(?::(\d+))?\s*(am|pm)/i.exec(w || ""); return m ? (+m[1] % 12) * 60 + (+(m[2] || 0)) + (m[3].toLowerCase() === "pm" ? 720 : 0) : 9999; };
+    const groups = new Map();
+    for (const f of fc.features) {
+      const pt = map.project(f.geometry.coordinates);
+      if (pt.x < L + 10 || pt.y < T + 20 || pt.x > Rr - 10 || pt.y > H - 10) continue;
+      if (vis && !vis.has(String(f.properties.id)) && String(f.properties.id) !== this._selId) continue;
+      const g = f.properties.hood || "x"; if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push({ f, pt, s: (plan.has(+f.properties.id) ? 0 : 100000) + (this._lbls.has(String(f.properties.id)) ? -50000 : 0) + (String(f.properties.id) === this._selId ? -200000 : 0) + (H - pt.y) });
+    }
+    const perArea = z > 15.6 ? 5 : z > 14.9 ? 4 : 3;
+    const cands = [];
+    for (const arr of groups.values()) { arr.sort((a, b) => a.s - b.s); arr.slice(0, perArea).forEach((c, r) => cands.push({ ...c, r })); for (const c of arr.slice(perArea, perArea + 4)) cands.push({ ...c, r: 50 }); }
+    cands.sort((a, b) => a.r - b.r || a.s - b.s);
+    const boxes = [], keep = [], STEMS = [8, 32, 56, 80, 104, 128];
+    const hit = (bx) => boxes.some(o => bx.x1 < o.x2 + 3 && bx.x2 > o.x1 - 3 && bx.y1 < o.y2 + 2 && bx.y2 > o.y1 - 2);
+    for (const c of cands) {
+      if (keep.length >= 28) break;
+      const w = this._lblText(c.f.properties).length * 5.9 + 26, h = 20;
+      let done = false;
+      for (const st of STEMS) { for (const dx of [0, -w / 2 + 10, w / 2 - 10]) {
+        const bx = { x1: c.pt.x - w / 2 + dx, x2: c.pt.x + w / 2 + dx, y2: c.pt.y - 6 - st, y1: c.pt.y - 6 - st - h };
+        if (bx.y1 < T || bx.x1 < L || bx.x2 > Rr) continue;
+        if (!hit(bx)) { boxes.push(bx); keep.push({ f: c.f, st, dx }); done = true; break; }
+      } if (done) break; }
+    }
+    const want = new Map(keep.map(k => [String(k.f.properties.id), k.st + "/" + Math.round(k.dx)]));
+    for (const [id, m] of this._lbls) if (force || want.get(id) !== m._st) { m.remove(); this._lbls.delete(id); }
+    for (const k of keep) {
+      const id = String(k.f.properties.id); if (this._lbls.has(id)) continue;
+      const el = this._lblEl(k.f, false, k.st);
+      if (k.dx) { el.firstChild.style.transform = "translateX(" + Math.round(k.dx) + "px)"; }
+      const m = new maplibregl.Marker({ element: el, anchor: "bottom", offset: [0, -6] }).setLngLat(k.f.geometry.coordinates).addTo(map);
+      m._st = k.st + "/" + Math.round(k.dx); this._lbls.set(id, m);
+    }
+  }
+
+  _hoverLabel(f) {
+    const map = this._map; if (!map) return;
+    const id = f ? String(f.properties.id) : null;
+    if (window.innerWidth < 820 && this._planIds().length) f = null;
+    if (this._hovLbl && this._hovId === id) return;
+    if (this._hovLbl) { this._hovLbl.remove(); this._hovLbl = null; this._hovId = null; }
+    if (!f || (this._lbls && this._lbls.has(id))) return;
+    const src = (this._lastFC && this._lastFC.features.find(x => String(x.properties.id) === id)) || f;
+    this._hovId = id;
+    this._hovLbl = new maplibregl.Marker({ element: this._lblEl(src, true), anchor: "bottom", offset: [0, -6] }).setLngLat(src.geometry.coordinates).addTo(map);
+  }
+
+  _onEvClick(ev) {
+    { const f0 = ev && ev.features && ev.features[0]; this._selId = f0 ? String(f0.properties.id) : null; }
+    const map = this._map;
+    const f = ev.features && ev.features[0]; if (!f) return;
+    const pr = f.properties, id = +pr.id;
+    const esc = (s) => String(s || "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+    const inPlan = () => this._planIds().includes(id);
+    const btnHtml = () => inPlan() ? "In your plan · Remove" : "+ Add to plan";
+    const evd = (this._events || [])[id] || {}, dc = Component.DAYC[evd.day || pr.day] || "#16181e";
+    const lum = (h) => { const n = parseInt(h.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b2 = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b2) / 255; };
+    const dark = lum(dc) > 0.6, ink = dark ? "#111111" : "#ffffff", sub = dark ? "rgba(17,17,17,0.72)" : "rgba(255,255,255,0.82)";
+    if (this._popup) this._popup.remove();
+    this._popup = new maplibregl.Popup({ closeButton: false, offset: 12, maxWidth: "270px" }).setLngLat(f.geometry.coordinates)
+      .setHTML('<div style="display:flex;flex-direction:column;gap:8px;font-family:\'IBM Plex Sans\',-apple-system,sans-serif;color:' + ink + '"><a href="' + esc(pr.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;gap:4px;text-decoration:none;color:' + ink + '"><span style="font-size:11px;color:' + sub + '">' + esc(pr.when) + '</span><span style="font-size:13px;font-weight:700;line-height:1.3">' + esc(pr.title) + '</span><span style="font-size:11px;color:' + sub + '">' + esc(pr.host) + ' · ' + esc(pr.hood) + '</span><span style="font-size:11px;color:' + ink + ';font-weight:600;text-decoration:underline;text-underline-offset:2px">Open event</span></a><button data-plan="1" style="height:32px;border-radius:3px;border:none;background:' + (inPlan() ? 'rgba(255,255,255,0.35)' : '#111111') + ';color:' + (inPlan() ? ink : '#ffffff') + ';font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">' + btnHtml() + '</button></div>')
+      .addTo(map);
+    { const pc = this._popup.getElement().querySelector(".maplibregl-popup-content"); if (pc) { pc.style.setProperty("background", dc, "important"); pc.style.setProperty("border-color", "rgba(0,0,0,0.12)"); } }
+    const b = this._popup.getElement().querySelector("[data-plan]");
+    if (b) b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); this._togglePlan(id); b.textContent = btnHtml(); b.style.background = inPlan() ? "rgba(255,255,255,0.35)" : "#111111"; b.style.color = inPlan() ? ink : "#ffffff"; });
+  }
+
+  // ---------- exports ----------
+  _stamp(e, addMin) { const st = this._mins(e.time) + (addMin || 0); const d = this._dnum(e) + Math.floor(st / 1440), m = ((st % 1440) + 1440) % 1440; return "202610" + String(d).padStart(2, "0") + "T" + String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0") + "00"; }
+
+  _gcal(e) {
+    const q = new URLSearchParams({ action: "TEMPLATE", text: e.title, dates: this._stamp(e) + "/" + this._stamp(e, this._dur(e)), ctz: "America/Los_Angeles", details: "Host: " + e.host + "\n" + e.url, location: (e.hood || "") + ", " + this._city().name });
+    return "https://calendar.google.com/calendar/render?" + q.toString();
+  }
+
+  _download(name, blob) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+
+  _exportIcs() {
+    const E = this._events || [], ids = this._planIds();
+    if (!ids.length) return this._toast("Add events to your plan first");
+    const esc = (s) => String(s || "").replace(/\\/g, "\\\\").replace(/[,;]/g, m => "\\" + m).replace(/\n/g, "\\n");
+    const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//SF Tech Week Map 26//EN", "CALSCALE:GREGORIAN"];
+    for (const id of ids) { const e = E[id]; if (!e) continue;
+      L.push("BEGIN:VEVENT", "UID:sftw-" + id + "@techweekmap", "DTSTAMP:20260922T000000Z", "DTSTART;TZID=America/Los_Angeles:" + this._stamp(e), "DTEND;TZID=America/Los_Angeles:" + this._stamp(e, this._dur(e)), "SUMMARY:" + esc(e.title), "LOCATION:" + esc((e.hood || "") + ", " + this._city().name), "DESCRIPTION:" + esc("Host: " + e.host + "\n" + e.url), "URL:" + e.url, "END:VEVENT"); }
+    L.push("END:VCALENDAR");
+    this._download(this._meta().short.toLowerCase() + "-tech-week-plan.ics", new Blob([L.join("\r\n")], { type: "text/calendar" }));
+    this._toast("Calendar file downloaded");
+  }
+
+  _copyText(text) {
+    const fallback = () => {
+      const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+      let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+      ta.remove(); return ok;
+    };
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(() => true, () => fallback());
+    return Promise.resolve(fallback());
+  }
+
+  _shareLink() {
+    const ids = this._planIds();
+    if (!ids.length) return this._toast("Add events to your plan first");
+    const url = location.href.split("#")[0] + "#city=" + this.state.city + "&plan=" + ids.join(".");
+    this._copyText(url).then(ok => ok ? this._toast("Link copied to clipboard") : window.prompt("Copy this link", url));
+  }
+
+  _shareLinkedIn() {
+    const ids = this._planIds();
+    if (!ids.length) return this._toast("Add events to your plan first");
+    const city = this.state.city === "la" ? "LA" : "SF";
+    const url = location.href.split("#")[0] + "#city=" + this.state.city + "&plan=" + ids.join(".");
+    const text = "My " + city + " Tech Week plan: " + ids.length + " events. Build yours: " + url;
+    window.open("https://www.linkedin.com/feed/?shareActive=true&text=" + encodeURIComponent(text), "_blank", "noopener,noreferrer");
+  }
+
+  _routeSvg(items, color, W, H) {
+    const pts = items.map(it => this._pos(it.e)).filter(Boolean);
+    if (!pts.length) return "";
+    let w = 180, e = -180, s = 90, n = -90;
+    for (const [x, y] of pts) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); }
+    const sx = Math.max((e - w) * 0.79, 0.004), sy = Math.max(n - s, 0.004), k = Math.min((W - 40) / sx, (H - 40) / sy);
+    const cx = (w + e) / 2, cy = (s + n) / 2;
+    const P = pts.map(([x, y]) => [W / 2 + (x - cx) * 0.79 * k, H / 2 - (y - cy) * k]);
+    let out = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><rect width="' + W + '" height="' + H + '" rx="10" fill="#f1efe9"></rect>';
+    out += '<polyline points="' + P.map(p => p.join(",")).join(" ") + '" fill="none" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+    P.forEach((p, i) => { out += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="10" fill="#fff" stroke="' + color + '" stroke-width="1.6"></circle><text x="' + p[0] + '" y="' + (p[1] + 4) + '" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif" fill="#111">' + (i + 1) + '</text>'; });
+    return out + "</svg>";
+  }
+
+  _exportPdf() {
+    const groups = this._planGroups();
+    if (!groups.length) return this._toast("Add events to your plan first");
+    const esc = (s) => String(s || "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+    let body = '<header><div class="hrow"><h1>My ' + this._meta().short + ' Tech Week</h1><a class="logo" href="https://www.zalak-patel.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.zalak-patel.com/Zalak_Brand_Logo.svg" alt="Zecco"></a></div><p>' + this._meta().range + ', 2026 · ' + this._planIds().length + ' events · Built with ' + this._meta().short + ' Tech Week Map\u201926 by <a class="zl" href="https://www.linkedin.com/in/zalak-zecco-patel-3a618890/" target="_blank" rel="noopener noreferrer">Zecco</a></p></header>';
+    for (const g of groups) {
+      const color = Component.DAYC[g.day] || "#555";
+      body += '<section style="--c:' + color + '"><div class="dh"><span class="dot" style="background:' + color + '"></span><h2>' + (Component.WD[g.day] || g.day) + ', Oct ' + this._dnum(g.items[0].e) + '</h2><span class="dc">' + g.items.length + (g.items.length === 1 ? ' event' : ' events') + '</span></div><table>';
+      for (const it of g.items) {
+        if (it.leg) body += '<tr class="leg"><td></td><td colspan="2">↓ ' + esc(it.leg.label) + (it.conflict ? ' · <b style="color:#c62828">overlaps previous</b>' : it.tight ? ' · <b style="color:#b26a00">tight</b>' : '') + '</td></tr>';
+        body += '<tr><td class="n"><span>' + it.n + '</span></td><td class="t">' + this._fmt(it.st) + '–' + this._fmt(it.en) + '</td><td><div class="ti">' + esc(it.e.title) + '</div><div class="su">' + esc(it.e.host) + ' · ' + esc(it.e.hood) + ', ' + this._city().name + '</div><div class="ln"><a href="' + esc(it.e.url) + '" target="_blank" rel="noopener noreferrer">Event page</a></div></td></tr>';
+      }
+      body += '</table></section>';
+    }
+    const css = '@page{size:letter;margin:0}body{font-family:"Inter",-apple-system,sans-serif;color:#111;margin:0;padding:0.6in}footer{margin-top:18px;padding-top:10px;border-top:1px solid #ddd;font-size:9.5pt;color:#555;display:flex;justify-content:space-between}footer a{color:#111;font-weight:600}.ln a{color:#1a5fb4;font-weight:600;text-decoration:none}header{border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:18px}h1{font-size:26pt;margin:0}header p{margin:4px 0 0;font-size:11pt;color:#444}.hrow{display:flex;align-items:center;justify-content:space-between;gap:16px}.logo img{height:30px;width:auto;display:block}.zl{color:#111;font-weight:700;text-decoration:underline}section{break-inside:avoid;margin-bottom:22px}.dh{display:flex;align-items:center;gap:8px;margin-bottom:8px}.dot{width:12px;height:12px;border-radius:50%}h2{font-size:16pt;margin:0}.dc{margin-left:auto;font-size:10pt;color:#555}section{padding:12px 0;border-bottom:1px solid #e5e5e5}section:last-of-type{border-bottom:none}table{border-collapse:collapse;width:100%;font-size:11pt}td{padding:5px 6px;vertical-align:top}.n{font-weight:700;width:22px}.n span{display:inline-flex;width:20px;height:20px;border-radius:50%;border:2px solid var(--c);align-items:center;justify-content:center;font-size:9pt;box-sizing:border-box}.t{white-space:nowrap;color:#333;width:110px}.ti{font-weight:700}.su{color:#444;font-size:10.5pt}.ln{color:#1a5fb4;font-size:8.5pt;word-break:break-all}.leg td{color:#555;font-size:10pt;padding-top:0;padding-bottom:0}';
+    body += '<footer><span>Designed by <a href="https://www.linkedin.com/in/zalak-zecco-patel-3a618890/">Zecco</a></span><a href="https://www.zalak-patel.com/">zalak-patel.com</a></footer>';
+    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>My Tech Week plan</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"><style>' + css + '</style></head><body>' + body + '</body></html>';
+    const fr = document.createElement("iframe");
+    fr.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+    document.body.appendChild(fr);
+    fr.contentDocument.open(); fr.contentDocument.write(html); fr.contentDocument.close();
+    const go = () => { try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) {} setTimeout(() => fr.remove(), 4000); };
+    const img = fr.contentDocument.querySelector(".logo img");
+    let fired = false; const once = () => { if (!fired) { fired = true; setTimeout(go, 250); } };
+    if (img && !img.complete) { img.onload = once; img.onerror = once; setTimeout(once, 2500); } else setTimeout(go, 700);
+  }
+
+  async _exportImage(date) {
+    const groups = this._planGroups();
+    const g = groups.find(q => q.date === date) || groups[0];
+    if (!g) return this._toast("Add events to your plan first");
+    try { await document.fonts.load("800 60px Inter"); await document.fonts.load("500 28px Inter"); await document.fonts.load("700 30px Inter"); } catch (e) {}
+    const W = 1080, H = 1920, c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"), color = Component.DAYC[g.day] || "#191919", F = "Inter, -apple-system, sans-serif";
+    const INK = "#191919", MUTED = "#5c5c5c", L = 80, R = W - 80, TX = 170, TW = R - TX;
+    x.fillStyle = "#ffffff"; x.fillRect(0, 0, W, H);
+    x.fillStyle = "rgba(25,25,25,0.07)"; for (let yy = 20; yy < H; yy += 32) for (let xx = 20; xx < W; xx += 32) { x.beginPath(); x.arc(xx, yy, 1.8, 0, 7); x.fill(); }
+    const wrapM = (text, font, maxW) => { x.font = font; const words = String(text).split(" "); const out = []; let cur = ""; for (const wd of words) { const t = cur ? cur + " " + wd : wd; if (x.measureText(t).width > maxW && cur) { out.push(cur); cur = wd; } else cur = t; } if (cur) out.push(cur); return out; };
+    const fit = (t, font, maxW) => { x.font = font; if (x.measureText(t).width <= maxW) return t; while (t.length > 2 && x.measureText(t + "…").width > maxW) t = t.slice(0, -1); return t.trim() + "…"; };
+    // header
+    x.fillStyle = MUTED; x.font = "600 26px " + F; x.fillText("MY " + this._meta().short + " TECH WEEK", L, 148);
+    x.fillStyle = INK; x.font = "800 34px " + F; x.textAlign = "right"; x.fillText("ZECCO", R, 150); x.textAlign = "left";
+    x.fillStyle = INK; x.fillRect(L, 184, R - L, 3);
+    const ttl = (Component.WD[g.day] || g.day) + ", Oct " + this._dnum(g.items[0].e);
+    let fs = 88; do { x.font = "800 " + fs + "px " + F; fs -= 4; } while (x.measureText(ttl).width > R - L - 40 && fs > 52);
+    x.fillStyle = color; x.beginPath(); x.arc(L + 14, 276, 14, 0, 7); x.fill();
+    x.fillStyle = INK; x.fillText(ttl, L + 44, 306);
+    x.fillStyle = MUTED; x.font = "500 32px " + F; x.fillText(g.items.length + (g.items.length === 1 ? " event" : " events") + " · " + this._fmt(g.items[0].st) + " to " + this._fmt(g.items[g.items.length - 1].en), L, 362);
+    // rows sizing
+    const n0 = g.items.length, sc = n0 > 8 ? 0.8 : n0 > 6 ? 0.88 : 1;
+    const TF = Math.round(40 * sc), TL = Math.round(50 * sc), TM = Math.round(28 * sc), SF = Math.round(28 * sc), LEG = Math.round(52 * sc), PAD = Math.round(30 * sc);
+    const rows = g.items.map(it => { const all = wrapM(it.e.title, "700 " + TF + "px " + F, TW); const lines = all.slice(0, 2); if (all.length > 2) lines[1] = fit(lines[1] + " " + all.slice(2).join(" "), "700 " + TF + "px " + F, TW); return { it, lines, h: PAD + TM + 16 + lines.length * TL + SF + 8 + PAD }; });
+    let y = 430, shown = 0; const limit = H - 190;
+    for (let k = 0; k < rows.length; k++) {
+      const r = rows[k], it = r.it;
+      const need = (k ? LEG : 0) + r.h;
+      if (y + need > limit) break;
+      shown++;
+      if (k) {
+        const lc = it.conflict ? "#c0322b" : it.tight ? "#9a5b00" : MUTED;
+        x.fillStyle = "rgba(25,25,25,0.18)"; x.fillRect(L + 25, y + 6, 3, LEG - 12);
+        x.fillStyle = lc; x.font = "600 " + Math.round(26 * sc) + "px " + F;
+        x.fillText("↓ " + it.leg.label + (it.conflict ? " · overlaps previous" : it.tight ? " · tight connection" : ""), TX, y + LEG * 0.64);
+        y += LEG;
+      }
+      // card
+      const cx0 = L - 16, cw = R - L + 32, rad = 22;
+      x.fillStyle = "#ffffff"; x.strokeStyle = it.conflict ? "rgba(192,50,43,0.5)" : it.tight ? "rgba(154,91,0,0.45)" : "rgba(25,25,25,0.12)"; x.lineWidth = 2;
+      x.beginPath(); x.moveTo(cx0 + rad, y); x.arcTo(cx0 + cw, y, cx0 + cw, y + r.h, rad); x.arcTo(cx0 + cw, y + r.h, cx0, y + r.h, rad); x.arcTo(cx0, y + r.h, cx0, y, rad); x.arcTo(cx0, y, cx0 + cw, y, rad); x.closePath(); x.fill(); x.stroke();
+      const top = y + PAD + TM;
+      x.fillStyle = "#ffffff"; x.beginPath(); x.arc(L + 26, top - TM * 0.35, Math.round(28 * sc), 0, 7); x.fill(); x.lineWidth = 5; x.strokeStyle = color; x.stroke();
+      x.fillStyle = INK; x.font = "800 " + Math.round(26 * sc) + "px " + F; x.textAlign = "center"; x.fillText(String(it.n), L + 26, top - TM * 0.35 + 9 * sc); x.textAlign = "left";
+      x.fillStyle = INK; x.font = "700 " + TM + "px " + F; x.fillText(this._fmt(it.st) + " – " + this._fmt(it.en), TX, top);
+      x.font = "700 " + TF + "px " + F; r.lines.forEach((ln, i) => x.fillText(ln, TX, top + 16 + TL * (i + 0.78)));
+      x.fillStyle = MUTED; x.fillText.call(x, fit(it.e.host + " · " + it.e.hood, "500 " + SF + "px " + F, TW), TX, top + 16 + TL * r.lines.length + SF * 0.95);
+      y += r.h;
+    }
+    if (shown < rows.length) { x.fillStyle = MUTED; x.font = "600 28px " + F; x.fillText("+ " + (rows.length - shown) + " more in your plan", TX, Math.min(y + 50, limit + 20)); }
+    // footer
+    x.fillStyle = "rgba(25,25,25,0.15)"; x.fillRect(L, H - 140, R - L, 2);
+    x.fillStyle = INK; x.font = "700 28px " + F; x.fillText(this._meta().short + " Tech Week Map\u201926 · " + this._meta().range, L, H - 96);
+    x.fillStyle = MUTED; x.font = "500 26px " + F; x.fillText("Designed by Zecco · zalak-patel.com", L, H - 56);
+    c.toBlob(b => { if (b) { this._download(this._meta().short.toLowerCase() + "-tech-week-" + g.day.toLowerCase() + ".png", b); this._toast("Image downloaded"); } }, "image/png");
+  }
+
+  _syncEvents() {
+    if (!this._map || !this._loaded || !this._shownList) return;
+    const src = this._map.getSource("events");
+    if (!src) return;
+    if (this._evSig === this._shownSig && this._evSrc === src) return;
+    const prevSig = this._evSig, sameSrc = this._evSrc === src;
+    this._evSig = this._shownSig; this._evSrc = src;
+    const fc = this._eventFC(this._shownList);
+    src.setData(fc);
+    this._lastFC = fc; this._updateLabels(true);
+    if (sameSrc && prevSig && prevSig !== this._shownSig) { if (this._skipFrame) this._skipFrame = false; else this._frameEvents(fc); }
+  }
+
+  _frameEvents(fc) {
+    const map = this._map;
+    if (this._popup) { this._popup.remove(); this._popup = null; }
+    clearTimeout(this._frameT);
+    const pad = { top: 90, bottom: 90, left: 320, right: 390 };
+    const parts = this._shownSig.split("|");
+    const isDefault = parts[1] === "All" && !parts[2] && !/true/.test(parts.slice(3).join("|"));
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const resumeOrbit = this.state.orbit !== false;
+    if (resumeOrbit) this.setState({ orbit: false });
+    const done = () => { if (resumeOrbit) this._frameT = setTimeout(() => this.setState({ orbit: true }), 600); };
+    if (isDefault || !fc.features.length) {
+      const cam = this._city().cam;
+      map.flyTo({ center: cam.center, zoom: cam.zoom, pitch: cam.pitch, bearing: cam.bearing, duration: 2400, curve: 1.3, easing: ease, essential: true });
+      map.once("moveend", done);
+      return;
+    }
+    // focus on the densest cluster of matches so the camera always zooms into where events are
+    const cells = {};
+    for (const f of fc.features) { const [x, y] = f.geometry.coordinates; const k = Math.round(x / 0.008) + ":" + Math.round(y / 0.008); cells[k] = (cells[k] || 0) + 1; }
+    let bestK = null, best = -1;
+    for (const k in cells) { const [cx, cy] = k.split(":").map(Number); let sc = 0; for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) sc += cells[(cx + dx) + ":" + (cy + dy)] || 0; if (sc > best) { best = sc; bestK = [cx * 0.008, cy * 0.008]; } }
+    const R = 0.016;
+    const near = fc.features.filter(f => Math.abs(f.geometry.coordinates[0] - bestK[0]) < R * 1.27 && Math.abs(f.geometry.coordinates[1] - bestK[1]) < R);
+    const pool = near.length ? near : fc.features;
+    const xs = pool.map(f => f.geometry.coordinates[0]).sort((a, b) => a - b);
+    const ys = pool.map(f => f.geometry.coordinates[1]).sort((a, b) => a - b);
+    const q = (arr, t) => arr[Math.min(arr.length - 1, Math.max(0, Math.round((arr.length - 1) * t)))];
+    const trim = pool.length > 12 ? 0.08 : 0;
+    let w = q(xs, trim), ea = q(xs, 1 - trim), so = q(ys, trim), no = q(ys, 1 - trim);
+    const minSpan = 0.004;
+    if (ea - w < minSpan) { const c = (ea + w) / 2; w = c - minSpan / 2; ea = c + minSpan / 2; }
+    if (no - so < minSpan * 0.8) { const c = (no + so) / 2; so = c - minSpan * 0.4; no = c + minSpan * 0.4; }
+    const target = map.cameraForBounds([[w, so], [ea, no]], { padding: pad, maxZoom: 16.6, bearing: map.getBearing() });
+    if (!target) return;
+    const z = Math.min(Math.max(target.zoom, map.getZoom() + 0.4, 14.6), 16.6);
+    const pitch = z > 15 ? 64 : z > 13.5 ? 58 : 48;
+    map.flyTo({ center: target.center, zoom: z, pitch, bearing: map.getBearing() + 22, duration: 2600, curve: 1.25, speed: 0.9, easing: ease, essential: true });
+    map.once("moveend", done);
+  }
+
+  _dayColorExpr() {
+    const D = Component.DAYC;
+    return ["match", ["get", "day"], "Mon", D.Mon, "Tue", D.Tue, "Wed", D.Wed, "Thu", D.Thu, "Fri", D.Fri, "Sat", D.Sat, "Sun", D.Sun, "#8e8e93"];
+  }
+
+  _addEventLayers() {
+    const map = this._map;
+    this._evSrc = null;
+    if (map.getSource("events")) return this._syncEvents();
+    map.addSource("events", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "events-halo", type: "circle", source: "events", filter: ["!", ["has", "point_count"]], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 4, 16, 10], "circle-color": this._dayColorExpr(), "circle-opacity": 0.28, "circle-blur": 0.6 } });
+    map.addLayer({ id: "events-dot", type: "circle", source: "events", filter: ["!", ["has", "point_count"]], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 2.2, 16, 5], "circle-color": this._dayColorExpr(), "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 11, 0.6, 16, 1.5], "circle-stroke-color": "#ffffff" } });
+    {
+      const ls = map.getStyle().layers.filter(l => l.type === "symbol" && l.layout && l.layout["text-font"]);
+      const fb = (ls.find(l => /semibold|bold|medium/i.test(JSON.stringify(l.layout["text-font"]))) || ls[0] || {}).layout?.["text-font"] || ["Open Sans Semibold"];
+      const nt = !!this.state.night;
+    }
+    if (!this._clBound) {
+      this._clBound = true;
+      map.on("click", "events-cluster", (ev) => {
+        const f = ev.features && ev.features[0]; if (!f) return;
+        const src = map.getSource("events"), cid = f.properties.cluster_id, c = f.geometry.coordinates;
+        let done = false;
+        const go = (z) => { if (done) return; done = true; if (this.state.orbit !== false) this.setState({ orbit: false }); map.easeTo({ center: c, zoom: Math.min((typeof z === "number" ? z : map.getZoom() + 1.5) + 0.2, 17.5), duration: 900 }); };
+        try { const r = src.getClusterExpansionZoom(cid, (err, z) => { if (!err) go(z); }); if (r && typeof r.then === "function") r.then(go).catch(() => go()); } catch (e) { go(); }
+      });
+      map.on("mouseenter", "events-cluster", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "events-cluster", () => { map.getCanvas().style.cursor = ""; });
+    }
+    this._homeSig = null;
+    if (!this._evBound) {
+      this._evBound = true;
+      const esc = (s) => String(s || "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+      map.on("click", "events-dot", (ev) => this._onEvClick(ev));
+      map.on("mouseenter", "events-dot", () => { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", "events-dot", () => { map.getCanvas().style.cursor = ""; this._hoverLabel(null); });
+      map.on("mousemove", "events-dot", (ev) => this._hoverLabel(ev.features && ev.features[0]));
+      map.on("idle", () => { if (!this._lbls || !this._lbls.size) this._updateLabels(true); });
+      this._lblTimer = setInterval(() => { try { this._updateLabels(); } catch (e) { console.warn("labels", e); } }, 1500);
+      map.on("moveend", () => {
+        clearTimeout(this._lblDeb);
+        this._lblDeb = setTimeout(() => {
+          const c = map.getCenter(), sig = Math.round(map.getZoom() * 5) + "|" + c.lng.toFixed(3) + "|" + c.lat.toFixed(3) + "|" + Math.round(map.getPitch() / 10);
+          if (sig === this._lblSig) return;
+          this._lblSig = sig; this._updateLabels();
+        }, 350);
+      });
+    }
+    this._syncEvents();
+  }
+
+  componentDidUpdate() { this._syncEvents(); this._syncPlan(); this._syncHome(); const pn = this._planIds().length; if (pn !== this._lblPlanN) { this._lblPlanN = pn; this._updateLabels(true); } }
+
+  _startOrbit() {
+    const map = this._map;
+    if (!this._orbitBound) {
+      this._orbitBound = true;
+      const stop = () => { if (this.state.orbit !== false) this.setState({ orbit: false }); };
+      map.on("mousedown", stop); map.on("touchstart", stop); map.on("wheel", stop); map.on("dragstart", stop);
+    }
+    if (this._orbitRaf) return;
+    let last = performance.now();
+    const step = (now) => {
+      this._orbitRaf = requestAnimationFrame(step);
+      const dt = Math.min((now - last) / 1000, 0.1); last = now;
+      if (this.state.orbit === false || !this._map || map.isMoving() && !this._orbitMoving) return;
+      const sp = this.state.orbitSpeed ?? 1, dir = this.state.orbitDir ?? 1;
+      this._orbitMoving = true;
+      map.setBearing(map.getBearing() + dir * 4 * sp * dt);
+      this._orbitMoving = false;
+    };
+    this._orbitRaf = requestAnimationFrame(step);
+  }
+
+  componentDidMount() {
+    const hc = /city=(sf|la)/.exec(location.hash || "");
+    if (hc && hc[1] !== this.state.city) this.state.city = hc[1];
+    this._loadCity(this.state.city, true);
+    if (this.state.city === "la") setTimeout(() => { const cam = this._city().cam; if (this._map) this._map.jumpTo({ center: cam.center, zoom: cam.zoom, pitch: cam.pitch, bearing: cam.bearing }); }, 0);
+    this._tickClock();
+    this._clockTimer = setInterval(() => this._tickClock(), 1000);
+    this._statTimer = setInterval(() => this._tickStats(), 2000);
+    this._waitForLib();
+    try { if (localStorage.getItem("tw-hide-tags") === "1") this.state.hideTags = true; } catch (e) {}
+    try { this.state.homes = JSON.parse(localStorage.getItem("tw-homes") || "{}") || {}; const tm = localStorage.getItem("tw-tmode"); if (tm && Component.SPEED[tm]) this.state.tmode = tm; } catch (e) {}
+    this._onResize = () => { const m = window.innerWidth < 820; if (m !== this._lastMob) { this._lastMob = m; this.forceUpdate(); } };
+    window.addEventListener("resize", this._onResize); this._onResize();
+    this._ro = new ResizeObserver(() => this._onResize()); this._ro.observe(document.documentElement);
+    requestAnimationFrame(() => this._onResize()); setTimeout(() => this._onResize(), 400);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onResize); clearInterval(this._lblTimer); if (this._mapRO) this._mapRO.disconnect(); if (this._ro) this._ro.disconnect();
+    clearInterval(this._clockTimer);
+    clearInterval(this._statTimer);
+    cancelAnimationFrame(this._raf);
+    cancelAnimationFrame(this._orbitRaf);
+    clearTimeout(this._toastT);
+    if (this._map) { try { this._map.remove(); } catch (e) {} }
+  }
+
+  _city() { return Component.CITIES[this.state.city]; }
+
+  _tickClock() {
+    const now = new Date();
+    const c = this._city();
+    this.setState({
+      clock: now.toLocaleTimeString("en-US", { timeZone: c.tz, hour12: false }),
+      dateStr: now.toLocaleDateString("en-US", { timeZone: c.tz, weekday: "short", month: "short", day: "numeric" }).toUpperCase()
+    });
+  }
+
+  _localHour() {
+    const c = this._city();
+    const parts = new Date().toLocaleTimeString("en-US", { timeZone: c.tz, hour12: false }).split(":");
+    return parseInt(parts[0], 10) + parseInt(parts[1], 10) / 60;
+  }
+
+  _timeFactor() {
+    const h = this._localHour();
+    const g = (m, s) => Math.exp(-((h - m) * (h - m)) / (2 * s * s));
+    return Math.min(1, 0.3 + 0.75 * (g(8, 1.5) + g(17.2, 1.9)) + 0.15 * g(12.5, 1.2));
+  }
+
+  _congestion(seed) {
+    const rainMul = this.state.rain ? 1.28 : 1;
+    const wobble = 0.9 + 0.2 * Math.sin(Date.now() / 40000 + seed * 7);
+    return Math.max(0.05, Math.min(1, this._timeFactor() * rainMul * wobble));
+  }
+
+  _tickStats() {
+    const c = this._city();
+    for (let i = 0; i < c.junctions.length; i++) {
+      const j = c.junctions[i];
+      const cong = this._congestion(i);
+      const flow = Math.round(j.base * (0.35 + 0.65 * cong));
+      const delay = Math.round(15 + 95 * cong);
+      const co2 = Math.round(flow * 0.21 * (1 + 0.8 * cong));
+      const cost = Math.round(flow * (delay / 3600) * 18 + co2 * 0.19);
+      this._metrics[j.id] = { flow, delay, co2, cost, cong };
+      if (!this._history[j.id]) this._history[j.id] = [];
+      this._history[j.id].push(cost);
+      if (this._history[j.id].length > 30) this._history[j.id].shift();
+    }
+    this._updateJunctionRings();
+    this.setState(st => ({ tick: st.tick + 1 }));
+  }
+
+  _waitForLib(tries = 0) {
+    if (window.maplibregl && this._mapEl) return this._initMap();
+    if (tries > 200) return this.setState({ loading: false, errorMsg: "MapLibre GL failed to load. Check your network connection." });
+    setTimeout(() => this._waitForLib(tries + 1), 50);
+  }
+
+  _initMap() {
+    if (this._map) return;
+    const cam = this._city().cam;
+    let map;
+    try {
+      map = new maplibregl.Map({
+        container: this._mapEl,
+        style: this._styleUrl(),
+        center: cam.center, zoom: cam.zoom, pitch: cam.pitch, bearing: cam.bearing,
+        maxPitch: 75, antialias: true, attributionControl: { compact: true }
+      });
+      const collapseAttrib = () => { const el = this._mapEl && this._mapEl.querySelector(".maplibregl-ctrl-attrib"); if (el) { el.classList.remove("maplibregl-compact-show"); el.removeAttribute("open"); } };
+      map.once("load", collapseAttrib); map.once("idle", collapseAttrib); setTimeout(collapseAttrib, 800); setTimeout(collapseAttrib, 2500);
+    } catch (e) {
+      return this.setState({ loading: false, errorMsg: "Could not create map: " + e.message });
+    }
+    this._map = map;
+    this._loaded = false;
+    const fit = () => { if (this._map) { const cv = this._map.getCanvas(), el = this._mapEl; if (el && (Math.abs(cv.clientWidth - el.clientWidth) > 1 || Math.abs(cv.clientHeight - el.clientHeight) > 1)) { this._map.resize(); this._updateLabels(true); } } };
+    if (this._mapRO) this._mapRO.disconnect();
+    this._mapRO = new ResizeObserver(fit); this._mapRO.observe(this._mapEl);
+    requestAnimationFrame(fit); setTimeout(fit, 300); setTimeout(fit, 1200);
+    map.on("load", () => {
+      this._loaded = true;
+      map.resize();
+      try {
+        this._setupLayers();
+        this._tickStats();
+        this._startLoop();
+        this._startOrbit();
+      } catch (e) { console.warn("twin setup error", e); }
+      this.setState({ loading: false });
+    });
+    this._watchErrors();
+  }
+
+  _styleUrl() {
+    if (this._styleFallback) return this.state.night ? "https://tiles.openfreemap.org/styles/dark" : "https://tiles.openfreemap.org/styles/positron";
+    return this.state.night
+      ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+      : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+  }
+
+  _setupLayers() {
+    const map = this._map;
+    this._applyTheme();
+        this._addBuildings();
+        const under = map.getLayer("bld-3d") ? "bld-3d" : undefined;
+        if (!map.getSource("vehicles")) map.addSource("vehicles", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+        map.addLayer({ id: "vehicles", type: "circle", source: "vehicles", paint: {
+          "circle-radius": 3.2, "circle-color": ["get", "col"], "circle-opacity": 0.95,
+          "circle-stroke-width": 1, "circle-stroke-color": "rgba(25,25,30,0.4)"
+        } }, under);
+    this._addEventLayers();
+    this._addPlanLayers();
+  }
+
+  _watchErrors() {
+    const map = this._map;
+    let styleOk = false, tileErrs = 0;
+    map.once("styledata", () => { styleOk = true; });
+    const useFallback = () => {
+      if (this._styleFallback) return false;
+      this._styleFallback = true;
+      console.warn("Basemap style unreachable, switching to fallback provider");
+      try { map.setStyle(this._styleUrl()); map.once("styledata", () => { styleOk = true; }); return true; } catch (err) { return false; }
+    };
+    map.on("error", (e) => {
+      const msg = String((e && e.error && (e.error.message || e.error)) || "");
+      const url = String((e && e.error && e.error.url) || "");
+      const isTile = !!(e && (e.tile || e.sourceId)) || /\/(tiles?|fonts?|sprites?)\//i.test(url) || /\.(pbf|mvt|png|webp|jpg)(\?|$)/i.test(url);
+      if (isTile) { if (++tileErrs <= 5) console.warn("Basemap tile failed (ignored):", url || msg); return; }
+      if (this._loaded || styleOk) { console.warn("Map error (non-fatal):", msg); return; }
+      if (useFallback()) return;
+      this.setState({ loading: false, errorMsg: "The basemap couldn't be reached. Check your connection and retry." });
+    });
+    clearTimeout(this._loadGuard);
+    this._loadGuard = setTimeout(() => {
+      if (this._map !== map || this._loaded) return;
+      if (!styleOk && useFallback()) return;
+      if (!styleOk) this.setState({ loading: false, errorMsg: "The basemap couldn't be reached. Check your connection and retry." });
+    }, 15000);
+  }
+
+  _congColorExpr() {
+    return ["interpolate", ["linear"], ["get", "c"], 0.15, "#4fae72", 0.55, "#d9b23d", 0.85, "#d95c48"];
+  }
+
+  _corridorFC() {
+    return { type: "FeatureCollection", features: this._city().corridors.map((r, i) => ({
+      type: "Feature", properties: { c: this._congestion(i) }, geometry: { type: "LineString", coordinates: r.coords }
+    })) };
+  }
+
+  _transitFC() {
+    return { type: "FeatureCollection", features: this._city().lines.map(l => ({
+      type: "Feature", properties: { color: l.color }, geometry: { type: "LineString", coordinates: l.coords }
+    })) };
+  }
+
+  _buildTrains() {
+    for (const t of this._trains) t.marker.remove();
+    this._trains = [];
+    for (const l of this._city().lines) {
+      const line = { ...l, cum: this._measure(l.coords) };
+      const total = line.cum[line.cum.length - 1];
+      for (let i = 0; i < l.trains; i++) {
+        const d = (total / l.trains) * (i + 0.5);
+        const el = document.createElement("div");
+        el.style.cssText = "pointer-events:none;will-change:transform;display:flex;flex-direction:column;align-items:center;gap:1px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.45))";
+        // 3-car train seen from above: nose car + 2 cars, lighter roof stripe + cab windows
+        const car = (nose) => `<div style="width:9px;height:15px;border-radius:${nose ? "4px 4px 2px 2px" : "2px"};background:linear-gradient(90deg, ${l.color} 0%, #ffffff55 45%, ${l.color} 60%);border:1px solid rgba(20,20,25,0.55);box-sizing:border-box;position:relative">${nose ? '<div style="position:absolute;top:1.5px;left:1.5px;right:1.5px;height:3px;border-radius:1.5px;background:rgba(15,20,30,0.8)"></div>' : ''}</div>`;
+        el.innerHTML = car(true) + car(false) + car(false);
+        if (!this.state.transit) el.style.display = "none";
+        const marker = new maplibregl.Marker({ element: el, rotationAlignment: "map", pitchAlignment: "map", rotation: this._bearingAt(line, d) })
+          .setLngLat(this._pointAt(line, d)).addTo(this._map);
+        this._trains.push({ marker, el, line, d, dir: i % 2 ? -1 : 1, speed: 15 + Math.random() * 4 });
+      }
+    }
+  }
+
+  _setTransitVisibility() {
+    const vis = this.state.transit;
+    for (const t of this._trains) t.el.style.display = vis ? "" : "none";
+    if (this._map && this._map.getLayer("transit-core")) {
+      for (const id of ["transit-core", "transit-glow"]) this._map.setLayoutProperty(id, "visibility", vis ? "visible" : "none");
+    }
+  }
+
+  _addBuildings() {
+    const map = this._map;
+    let src = null;
+    for (const lyr of map.getStyle().layers) {
+      if (lyr["source-layer"] === "building") { src = lyr.source; if (lyr.type === "fill") map.setLayoutProperty(lyr.id, "visibility", "none"); }
+    }
+    if (!src) return;
+    const H = ["coalesce", ["to-number", ["get", "render_height"]], ["to-number", ["get", "height"]], 15];
+    const firstSymbol = map.getStyle().layers.find(l => l.type === "symbol");
+    map.addLayer({
+      id: "bld-3d", type: "fill-extrusion", source: src, "source-layer": "building", minzoom: 10,
+      paint: {
+        "fill-extrusion-color": this._bldColorExpr(),
+        "fill-extrusion-height": ["min", ["+", ["min", H, 40], ["*", ["max", ["-", H, 40], 0], 0.3]], 90],
+        "fill-extrusion-base": ["coalesce", ["to-number", ["get", "render_min_height"]], 0],
+        "fill-extrusion-opacity": 1,
+        "fill-extrusion-vertical-gradient": true
+      }
+    }, firstSymbol ? firstSymbol.id : undefined);
+    // keep every basemap road/line/fill layer under the extrusions (bridges etc. would otherwise stripe over towers)
+    const order = map.getStyle().layers.map(l => l.id);
+    const bldIdx = order.indexOf("bld-3d");
+    for (let i = bldIdx + 1; i < order.length; i++) {
+      const lyr = map.getLayer(order[i]);
+      if (lyr && lyr.type !== "symbol" && lyr.id !== "bld-3d") map.moveLayer(order[i], "bld-3d");
+    }
+  }
+
+  _bldColorExpr() {
+    const H = ["coalesce", ["to-number", ["get", "render_height"]], ["to-number", ["get", "height"]], 15];
+    return this.state.night
+      ? ["interpolate", ["linear"], H, 0, "#232c3e", 15, "#2b364c", 50, "#38425c", 100, "#55506a", 180, "#8a6a45", 320, "#e8a04e"]
+      : ["interpolate", ["linear"], H, 0, "#eeeade", 30, "#e3ded2", 80, "#ccd3d9", 150, "#a8bccd", 250, "#84a4c2", 400, "#6d90b3"];
+  }
+
+  _applyTheme() {
+    const map = this._map;
+    const night = this.state.night;
+    if (night) map.setLight({ color: "#cfd8ff", intensity: 0.4, anchor: "viewport", position: [1.3, 210, 30] });
+    else map.setLight({ color: "#ffffff", intensity: 0.25, anchor: "viewport", position: [1.15, 210, 30] });
+    for (const lyr of map.getStyle().layers) {
+      if (lyr.type === "background") map.setPaintProperty(lyr.id, "background-color", night ? "#0a0f1c" : "#e8e6df");
+      if (lyr.type === "fill" && /water/i.test(lyr.id)) map.setPaintProperty(lyr.id, "fill-color", night ? "#0c1526" : "#a9c7dd");
+      if (lyr.type === "fill" && /(park|green|wood|grass|cemetery|pitch|garden|landcover)/i.test(lyr.id)) map.setPaintProperty(lyr.id, "fill-color", night ? "#0c1a12" : "#9ccf83");
+      if (/boundary|admin|rail|transit|ferry|aeroway|tunnel|path|track|casing|pattern|oneway/i.test(lyr.id) && (lyr.type === "line" || lyr.type === "symbol")) map.setLayoutProperty(lyr.id, "visibility", "none");
+      if (lyr.type === "symbol" && /poi|housenumber|waterway.label|road_label|highway.label|minor/i.test(lyr.id)) map.setLayoutProperty(lyr.id, "visibility", "none");
+    }
+    if (map.getLayer("bld-3d")) map.setPaintProperty("bld-3d", "fill-extrusion-color", this._bldColorExpr());
+    if (map.getLayer("corridors-core")) map.setPaintProperty("corridors-core", "line-opacity", night ? 0.85 : 0.55);
+    if (map.getLayer("vehicles")) map.setPaintProperty("vehicles", "circle-radius", night ? 3.6 : 3.2);
+    if (map.getLayer("events-cluster")) { map.setPaintProperty("events-cluster", "circle-color", night ? "#ffffff" : "#111111"); map.setPaintProperty("events-cluster", "circle-stroke-color", night ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.85)"); map.setPaintProperty("events-cluster-count", "text-color", night ? "#111111" : "#ffffff"); }
+  }
+
+  _measure(coords) {
+    const cum = [0];
+    for (let i = 1; i < coords.length; i++) {
+      const dx = (coords[i][0] - coords[i-1][0]) * 111320 * Math.cos(coords[i][1] * Math.PI / 180);
+      const dy = (coords[i][1] - coords[i-1][1]) * 110540;
+      cum.push(cum[i-1] + Math.hypot(dx, dy));
+    }
+    return cum;
+  }
+
+  _bearingAt(line, d) {
+    const a = this._pointAt(line, Math.max(0, d - 20));
+    const b = this._pointAt(line, d + 20);
+    const dx = (b[0] - a[0]) * Math.cos(a[1] * Math.PI / 180);
+    const dy = b[1] - a[1];
+    return Math.atan2(dx, dy) * 180 / Math.PI;
+  }
+
+  _pointAt(line, d) {
+    const { coords, cum } = line;
+    if (d <= 0) return coords[0];
+    if (d >= cum[cum.length-1]) return coords[coords.length-1];
+    let i = 1;
+    while (cum[i] < d) i++;
+    const t = (d - cum[i-1]) / (cum[i] - cum[i-1]);
+    return [coords[i-1][0] + (coords[i][0] - coords[i-1][0]) * t, coords[i-1][1] + (coords[i][1] - coords[i-1][1]) * t];
+  }
+
+  _buildVehicles() {
+    this._vehicles = [];
+    const density = this.props.trafficDensity ?? 1;
+    const corridors = this._city().corridors.map(r => ({ ...r, cum: this._measure(r.coords) }));
+    this._corr = corridors;
+    for (let ci = 0; ci < corridors.length; ci++) {
+      const r = corridors[ci];
+      const total = r.cum[r.cum.length - 1];
+      const n = Math.max(4, Math.round((total / 1000) * 6 * density));
+      const pal = ["#d94f3d", "#f2b32c", "#e8863a", "#f4f1ea", "#4a90d9", "#3fa65c", "#c9c9c9"];
+      for (let i = 0; i < n; i++) {
+        this._vehicles.push({ r, ci, d: Math.random() * total, dir: i % 2 ? -1 : 1, base: 9 + Math.random() * 8, col: pal[(Math.random() * pal.length) | 0] });
+      }
+    }
+  }
+
+  _makeJunctionMarkers() {
+    for (const m of this._jMarkers) m.marker.remove();
+    this._jMarkers = [];
+    for (const j of this._city().junctions) {
+      const el = document.createElement("div");
+      el.className = "twin-junction";
+      el.style.cssText = "width:18px;height:18px;border-radius:50%;border:2.5px solid #d9b23d;background:rgba(217,178,61,0.15);box-shadow:0 0 10px rgba(217,178,61,0.7)";
+      el.addEventListener("click", (ev) => { ev.stopPropagation(); this.setState({ selected: j.id }); });
+      const marker = new maplibregl.Marker({ element: el }).setLngLat(j.lngLat).addTo(this._map);
+      this._jMarkers.push({ id: j.id, marker, el });
+    }
+    this._updateJunctionRings();
+  }
+
+  _updateJunctionRings() {
+    for (const jm of this._jMarkers) {
+      const m = this._metrics[jm.id];
+      const col = !m ? "#d9b23d" : m.cong > 0.75 ? "#d95c48" : m.cong > 0.45 ? "#d9b23d" : "#4fae72";
+      const sel = jm.id === this.state.selected;
+      jm.el.style.borderColor = col;
+      jm.el.style.boxShadow = `0 0 ${sel ? 16 : 9}px ${col}`;
+      jm.el.style.background = sel ? col + "55" : col + "22";
+      jm.el.style.width = sel ? "22px" : "18px";
+      jm.el.style.height = sel ? "22px" : "18px";
+    }
+  }
+
+  _startLoop() {
+    if (this._raf) return;
+    let last = performance.now(), congCache = [], congAt = 0, srcAt = 0;
+    const tick = (now) => {
+      this._raf = requestAnimationFrame(tick);
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      if (!this._map || !this._loaded || !this._corr) return;
+      if (now - congAt > 3000) {
+        congAt = now;
+        congCache = this._corr.map((r, i) => this._congestion(i));
+        const src = this._map.getSource("corridors");
+        if (src) {
+          src.setData({ type: "FeatureCollection", features: this._corr.map((r, i) => ({
+            type: "Feature", properties: { c: congCache[i] }, geometry: { type: "LineString", coordinates: r.coords }
+          })) });
+        }
+      }
+      const speedMul = (this.props.simSpeed ?? 1) * (this.state.rain ? 0.72 : 1);
+      const feats = [];
+      for (const v of this._vehicles) {
+        const c = congCache[v.ci] ?? 0.4;
+        const total = v.r.cum[v.r.cum.length - 1];
+        v.d += v.base * (1 - 0.62 * c) * speedMul * dt * v.dir;
+        if (v.d > total) { v.d = total; v.dir = -1; }
+        if (v.d < 0) { v.d = 0; v.dir = 1; }
+        feats.push({ type: "Feature", properties: { c, col: v.col }, geometry: { type: "Point", coordinates: this._pointAt(v.r, v.d) } });
+      }
+      const trainMul = this.props.simSpeed ?? 1;
+      for (const t of this._trains) {
+        if (t.el.style.display === "none") continue;
+        const total = t.line.cum[t.line.cum.length - 1];
+        t.d += t.speed * trainMul * dt * t.dir;
+        if (t.d > total) { t.d = total; t.dir = -1; }
+        if (t.d < 0) { t.d = 0; t.dir = 1; }
+        t.marker.setLngLat(this._pointAt(t.line, t.d));
+        t.marker.setRotation(this._bearingAt(t.line, t.d) + (t.dir < 0 ? 180 : 0));
+      }
+      if (now - srcAt > 33) {
+        srcAt = now;
+        const src = this._map.getSource("vehicles");
+        if (src) src.setData({ type: "FeatureCollection", features: feats });
+      }
+    };
+    this._raf = requestAnimationFrame(tick);
+  }
+
+  _switchCity(cityId) {
+    if (this.state.city === cityId || !this._map || !this._loaded) return;
+    const c = Component.CITIES[cityId];
+    this.setState({ city: cityId, selected: c.junctions[0].id }, () => {
+      this._metrics = {};
+      this._history = {};
+      this._buildVehicles();
+      this._buildTrains();
+      this._makeJunctionMarkers();
+      this._tickStats();
+      const src = this._map.getSource("transit");
+      if (src) src.setData(this._transitFC());
+      const cam = c.cam;
+      this._map.flyTo({ center: cam.center, zoom: cam.zoom, pitch: cam.pitch, bearing: cam.bearing, duration: 3200, curve: 1.5, essential: true });
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const c = this._city();
+    const sel = c.junctions.find(j => j.id === s.selected) || c.junctions[0];
+    const m = this._metrics[sel.id] || { flow: 0, delay: 0, co2: 0, cost: 0, cong: 0 };
+    const status = m.cong > 0.75 ? ["CONGESTED", "#d95c48"] : m.cong > 0.45 ? ["MODERATE", "#d9b23d"] : ["FREE FLOW", "#4fae72"];
+    let totFlow = 0, totCo2 = 0, totCost = 0;
+    for (const j of c.junctions) { const jm = this._metrics[j.id]; if (jm) { totFlow += jm.flow; totCo2 += jm.co2; totCost += jm.cost; } }
+    const hist = this._history[sel.id] || [];
+    const maxH = Math.max(1, ...hist);
+    const sparkBars = hist.map(v => ({ h: Math.round((v / maxH) * 100) + "%", color: v / maxH > 0.8 ? "#d95c48" : v / maxH > 0.5 ? "#d9b23d" : "#4fae72" }));
+    const cityBtn = (on) => on
+      ? { bg: "rgba(120,120,128,0.42)", fg: "#ffffff", border: "transparent" }
+      : { bg: "transparent", fg: "rgba(235,235,245,0.6)", border: "transparent" };
+
+    const FILTERS = [
+      { id: "topics", title: "Topics", show: 7, items: ["AI","AR / VR","B2B","B2C / Consumer","Climate","Creators","Crypto / Web3","Cybersecurity","Dev Tools","Fintech","Hardware","Health / Bio","Design","Product","Robotics","SaaS","VC"] },
+      { id: "hood", title: "Neighborhood", show: 7, items: this._hoodList() },
+      { id: "types", title: "Types", show: 7, items: ["Breakfast, Brunch or Lunch","Dinner","Experiential","Hackathon","Happy Hour","Matchmaking","Networking","Panel / Fireside Chat","Party","Pitch / Demo","Workshop","Wellness"] },
+      { id: "time", title: "Start time", show: 4, items: ["Morning","Noon","Afternoon","Evening"] }
+    ];
+    const selF = s.filters || {}, openF = s.openGroups || {};
+    const selCount = Object.values(selF).filter(Boolean).length;
+    const collF = s.collapsed || { topics: true, hood: true, types: true, time: true };
+    const groups = FILTERS.map(g => {
+      const open = !!openF[g.id];
+      const expanded = !collF[g.id];
+      const cnt = Object.keys(selF).filter(k => selF[k] && k.startsWith(g.id + ":")).length;
+      return {
+        title: g.title,
+        open: expanded, chev: expanded ? "rotate(180deg)" : "rotate(0deg)",
+        hasCount: cnt > 0, count: String(cnt),
+        toggleOpen: () => this.setState(st => { const c = st.collapsed || { topics: true, hood: true, types: true, time: true }; return { collapsed: { ...c, [g.id]: !c[g.id] } }; }),
+        hasMore: g.items.length > g.show,
+        moreLabel: open ? "Show less" : "Show more",
+        toggleMore: () => this.setState(st => ({ openGroups: { ...(st.openGroups || {}), [g.id]: !open } })),
+        chips: (open ? g.items : g.items.slice(0, g.show)).map(label => {
+          const k = g.id + ":" + label, on = !!selF[k];
+          return {
+            label,
+            bg: on ? "#191919" : "#ffffff",
+            fg: on ? "#ffffff" : "#191919",
+            border: on ? "#191919" : "rgba(25,25,25,0.16)",
+            toggle: () => this.setState(st => ({ filters: { ...(st.filters || {}), [k]: !on } }))
+          };
+        })
+      };
+    });
+
+    const EVENTS = this._events || [];
+    const active = {};
+    for (const k of Object.keys(selF)) if (selF[k]) { const [gid, lab] = [k.slice(0, k.indexOf(":")), k.slice(k.indexOf(":") + 1)]; (active[gid] = active[gid] || []).push(lab); }
+    const q = (s.query || "").trim().toLowerCase();
+    const day = s.day || "All";
+    const dayPills = ["All","Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d => ({
+      label: d, bd: d === day ? (Component.DAYC[d] || "#191919") : "rgba(25,25,25,0.16)", bg: d === day ? (Component.DAYC[d] || "#191919") : "#ffffff", fg: d === day ? (d === "All" ? "#ffffff" : "#111111") : "#191919",
+      dot: Component.DAYC[d] || "transparent", hasDot: d !== "All",
+      go: () => this.setState({ day: d })
+    }));
+    let shown = EVENTS.filter(e => (day === "All" || e.day === day) &&
+      Object.keys(active).every(gid => active[gid].some(lab => this._matches(e, gid, lab))) &&
+      (!q || (e.title + " " + e.host + " " + e.hood).toLowerCase().includes(q)));
+    if (s.gap) shown = this._gapList(s.gap);
+    const hmx0 = this._home();
+    if (s.alt) shown = this._altList(s.alt);
+    else if (!s.gap) {
+      const ix = new Map(EVENTS.map((e, i) => [e, i]));
+      shown = shown.slice().sort((a, b) => (this._dnum(a) - this._dnum(b)) || ((this._tba(a) ? 1 : 0) - (this._tba(b) ? 1 : 0)) || (ix.get(a) - ix.get(b)));
+      if (hmx0) {
+        const w = s.within && s.within !== "any" ? +s.within : null, memo = new Map();
+        const hmOf = (e) => { if (!memo.has(e)) memo.set(e, this._homeMin(e)); return memo.get(e); };
+        if (w) shown = shown.filter(e => { const m = hmOf(e); return m != null && m <= w; });
+        if (s.tsort === "nearest") shown = shown.slice().sort((a, b) => ((hmOf(a) ?? 9999) - (hmOf(b) ?? 9999)));
+      }
+    }
+    const limit = s.limit || 40;
+    const planIds = s.plan || [], planSet = new Set(planIds);
+    this._shownList = shown;
+    this._shownSig = (this._events ? this._events.length : 0) + "|" + day + "|" + q + "|" + JSON.stringify(selF) + (s.gap ? "|gap" + s.gap.from : "") + (s.alt ? "|alt" + s.alt.t + s.alt.date : "") + (hmx0 && s.within && s.within !== "any" ? "|w" + s.within + this._mode() + hmx0.xy.join(",") : "");
+    const tab = s.tab || "events";
+    const groups2 = this._events ? this._planGroups() : [];
+    const planDays = groups2.map(g => {
+      const rows = [];
+      let conflicts = 0, tights = 0;
+      if (g.homeLeg) rows.push({ isLeg: true, text: "↓ From " + ((this._home() || {}).name || "home") + " · " + g.homeLeg.label, color: "#6b6b6b" });
+      g.items.forEach(it => {
+        if (it.open) rows.push({ isGap: true, text: this._gapLabel(it.open.from, it.open.to), fill: () => this._fillGap(it.open, g.date, g.day) });
+        if (it.leg) { const pv = g.items[g.items.indexOf(it) - 1], pvx = pv ? this._pos(pv.e) : null;
+          rows.push({ isLeg: true, text: it.tight ? "↓ Only " + Math.max(0, it.gapMin) + " min gap, ~" + it.leg.min + " min away" : "↓ " + it.leg.label + (it.conflict ? " · overlaps" : ""), color: it.conflict || it.tight ? "#c0322b" : "#6b6b6b",
+            hasAlt: !!it.tight && !!pvx, alt: () => this.setState({ alt: { date: g.date, t: it.st, near: pvx }, gap: null, tab: "events", day: g.day, limit: 40, mSheet: window.innerWidth < 820 ? "events" : this.state.mSheet }) }); }
+        if (it.conflict) conflicts++; if (it.tight) tights++;
+        rows.push({ isEvent: true, n: String(it.n), range: it.tba ? "Time TBA" : this._fmt(it.st) + " – " + this._fmt(it.en), title: it.e.title, sub: it.e.host + " · " + it.e.hood, url: it.e.url, gcal: this._gcal(it.e),
+          conflict: !!it.conflict, conflictText: "OVERLAPS #" + (it.n - 1), tight: !!it.tight, tightText: "TIGHT: " + it.leg?.label + ", " + Math.max(0, it.gapMin || 0) + " min gap",
+          border: it.conflict ? "rgba(192,50,43,0.55)" : it.tight ? "rgba(154,91,0,0.45)" : "rgba(25,25,25,0.1)",
+          remove: () => this._setPlan(this._planIds().filter(x => x !== it.e.id)) });
+      });
+      if (g.tail) rows.push({ isGap: true, text: "Free after " + this._fmt(g.tail.from), fill: () => this._fillGap(g.tail, g.date, g.day) });
+      const bits = [g.items.length + (g.items.length === 1 ? " event" : " events")];
+      { const trav = g.items.reduce((a, it) => a + (it.leg ? it.leg.min : 0), 0) + (g.homeLeg ? g.homeLeg.min : 0); if (trav) bits.push("~" + trav + " min travel"); }
+      if (conflicts) bits.push(conflicts + " overlap" + (conflicts > 1 ? "s" : ""));
+      if (tights) bits.push(tights + " tight");
+      return { label: this._dateLabel(g.items[0].e), color: Component.DAYC[g.day] || "#8e8e93", summary: bits.join(" · "), rows,
+        showRoute: () => this._framePlan(g.date), exportImg: () => this._exportImage(g.date) };
+    });
+    const autoThemes = s.autoThemes || { AI: true, Founders: true };
+    const autoDay = s.autoDay || "Tue";
+    const nudge = s.nudge;
+    const planVals = {
+      isEventsTab: tab === "events", isPlanTab: tab === "plan",
+      evTabBg: tab === "events" ? "#ffffff" : "transparent", evTabFg: tab === "events" ? "#191919" : (s.night ? "#3d3d3d" : "#565656"), planTabFg: tab === "plan" ? "#191919" : (s.night ? "#3d3d3d" : "#565656"),
+      planTabBg: tab === "plan" ? "#ffffff" : "transparent",
+      goEventsTab: () => this.setState({ tab: "events" }),
+      goPlanTab: () => this.setState({ tab: "plan" }),
+      hasPlan: planIds.length > 0, planCount: String(planIds.length), planEmpty: planIds.length === 0,
+      planDays,
+      gapActive: !!s.gap || !!s.alt,
+      gapBanner: s.alt ? "Nearby alternatives around " + this._fmt(s.alt.t) + ", within 10 min of your previous stop" : s.gap ? "Filling " + (Component.WD[s.gap.day] || s.gap.day) + " " + this._fmt(s.gap.from) + "–" + this._fmt(s.gap.to) + ", nearest first" : "",
+      clearGap: () => this.setState({ gap: null, alt: null, tab: "plan", mSheet: window.innerWidth < 820 && this.state.mSheet ? "plan" : this.state.mSheet }),
+      exportPdf: () => this._exportPdf(),
+      exportIcs: () => this._exportIcs(),
+      shareLink: () => this._shareLinkedIn(),
+      exportImgFirst: () => this._exportImage((groups2.find(g => g.day === day) || groups2[0] || {}).date),
+      autoOpen: s.autoOpen !== false, autoChev: s.autoOpen !== false ? "Hide" : "Themes + day",
+      toggleAuto: () => this.setState(st => ({ autoOpen: st.autoOpen === false })),
+      autoThemeChips: Component.AUTO_THEMES.map(t => { const on = !!autoThemes[t]; return { label: t, bg: on ? "#191919" : "#ffffff", fg: on ? "#ffffff" : "#191919", border: on ? "#191919" : "rgba(25,25,25,0.16)", toggle: () => this.setState(st => ({ autoThemes: { ...(st.autoThemes || { AI: true, Founders: true }), [t]: !on } })) }; }),
+      autoDayPills: Object.keys(this._week()).map(d => ({ label: d, dot: Component.DAYC[d], bd: d === autoDay ? Component.DAYC[d] : "rgba(25,25,25,0.16)", bg: d === autoDay ? (Component.DAYC[d]) : "#ffffff", fg: d === autoDay ? "#111111" : "#191919", go: () => this.setState({ autoDay: d }) })),
+      autoCta: "Build my " + Component.WD[autoDay],
+      runAuto: () => this._runAuto(),
+      hasNudge: !!nudge, nudgeText: nudge ? nudge.text : "", nudgeCta: nudge ? nudge.cta : "",
+      nudgeGo: () => { const n = this.state.nudge; this.setState({ nudge: null }); if (n) this._exportImage(n.date); },
+      nudgeClose: () => this.setState({ nudge: null }),
+      hasToast: !!s.toast, toastText: s.toast || ""
+    };
+
+    const mob = window.innerWidth < 820, sheet = s.mSheet || null;
+    const LW = "clamp(240px, 20vw, 300px)", RW = "clamp(300px, 24vw, 380px)";
+    const open = (k) => this.setState(k === "filters" ? { mSheet: k } : { mSheet: k, tab: k });
+    const sheetKey = sheet === "filters" ? "filters" : sheet ? tab : null;
+    const T = "calc(8px + env(safe-area-inset-top))", B = "calc(8px + env(safe-area-inset-bottom))";
+    const isPlanSheet = sheetKey === "plan";
+    const layout = mob ? {
+      mob: true, tH: "44px", tS: "44px", cityTabDisp: "none", mCapTitle: (s.city === "la" ? "Los Angeles" : "San Francisco") + " Tech Week 2026", mCapSub: this._meta().range + " · " + (s.city === "la" ? "800+" : "1700+") + " events mapped", cityShort: s.city === "la" ? "LA" : "SF", mSfBg: s.city !== "la" ? "#111111" : "transparent", mSfFg: s.city !== "la" ? "#ffffff" : "#111111", mLaBg: s.city === "la" ? "#111111" : "transparent", mLaFg: s.city === "la" ? "#ffffff" : "#111111", mobIdle: !sheetKey, mobOpen: !!sheetKey,
+      openFilters: () => open("filters"), openMobFilters: () => this.setState({ mSheet: "events", tab: "events", filtersOpen: true }), openEvents: () => open("events"), openPlan: () => open("plan"), closeSheet: () => this.setState({ mSheet: null }),
+      lpTop: T, lpX: "8px", lpR: "auto", lpBot: B, lpMaxH: "none", lpW: "min(86%, 340px)", lpDisp: sheetKey === "filters" ? "flex" : "none",
+      rpTop: isPlanSheet ? "auto" : T, rpX: "8px", rpL: isPlanSheet ? "8px" : "auto", rpBot: B, rpW: isPlanSheet ? "auto" : "min(90%, 380px)", rpH: isPlanSheet ? "72%" : "auto",
+      rpDisp: sheetKey && sheetKey !== "filters" ? "flex" : "none", rpSeg: "none",
+      ctrL: "8px", ctrR: "8px", obTop: "auto", obBot: "auto", obDisp: "none", ndTop: "calc(64px + env(safe-area-inset-top))", ndBot: "auto"
+    } : {
+      mob: false, tH: "26px", tS: "24px", cityTabDisp: "grid", mobIdle: false, mobOpen: false,
+      lpTop: "16px", lpX: "16px", lpR: "auto", lpBot: "auto", lpMaxH: "calc(100% - 32px)", lpW: LW, lpDisp: "flex",
+      rpTop: "16px", rpX: "16px", rpL: "auto", rpBot: "16px", rpW: RW, rpH: "auto", rpDisp: "flex", rpSeg: "grid",
+      ctrL: "calc(" + LW + " + 32px)", ctrR: "calc(" + RW + " + 32px)", obTop: "auto", obBot: "20px", obDisp: "flex", ndTop: "auto", ndBot: "68px"
+    };
+    layout.showNudge = !mob && !!planVals.hasNudge;
+    const nt = !!s.night;
+    Object.assign(layout, nt ? { gBg: "rgba(22,24,32,0.55)", gBd: "rgba(255,255,255,0.22)", gHi: "rgba(255,255,255,0.18)", gInk: "#ffffff", gSub: "rgba(255,255,255,0.78)", gImgF: "invert(1)" }
+      : { gBg: "rgba(255,255,255,0.28)", gBd: "rgba(255,255,255,0.6)", gHi: "rgba(255,255,255,0.85)", gInk: "#111111", gSub: "#333333", gImgF: "none" });
+    if (mob && nt) { layout.mSfBg = s.city !== "la" ? "#ffffff" : "transparent"; layout.mSfFg = s.city !== "la" ? "#111111" : "#ffffff"; layout.mLaBg = s.city === "la" ? "#ffffff" : "transparent"; layout.mLaFg = s.city === "la" ? "#111111" : "#ffffff"; }
+    {
+      const hmx = this._home(), ck = s.city === "la" ? "la" : "sf";
+      const opt = (cur, v, label, set) => ({ label, go: set, bg: cur === v ? "#191919" : "#ffffff", fg: cur === v ? "#ffffff" : "#191919", border: cur === v ? "#191919" : "rgba(25,25,25,0.16)" });
+      Object.assign(layout, {
+        hasHome: !!hmx, homeChipLabel: hmx ? hmx.name : "Near me",
+        homeChipBg: hmx ? "#191919" : "#ffffff", homeChipFg: hmx ? "#ffffff" : "#191919", homeChipBd: hmx ? "#191919" : "rgba(25,25,25,0.16)",
+        toggleHome: () => this.setState(st => ({ homeOpen: !st.homeOpen, homeEdit: false })),
+        homePopRef: (el) => { if (el && el !== this._homePop) { this._homePop = el; requestAnimationFrame(() => { let p = el.parentElement; while (p && !(p.scrollHeight > p.clientHeight + 2 && /auto|scroll/.test(getComputedStyle(p).overflowY))) p = p.parentElement; if (p) { const d = el.getBoundingClientRect().bottom - p.getBoundingClientRect().bottom + 12; if (d > 0) p.scrollTop += d; } }); } else if (!el) this._homePop = null; },
+        homeOpen: !!s.homeOpen, homeShowSet: !!hmx && !s.homeEdit, homeShowPick: !hmx || !!s.homeEdit, homeName: hmx ? hmx.name : "",
+        homeChange: () => this.setState({ homeEdit: true }), homeClear: () => this._setHome(null),
+        homeLocate: () => this._locate(), homeQ: s.homeQ || "", onHomeQ: (ev) => { const v = ev.target.value; this.setState({ homeQ: v }); this._suggest(v); },
+        hasSugg: !!(s.sugg && s.sugg.length), homeSugg: (s.sugg || []).map(g => ({ name: g.name, sub: g.sub, go: () => { this.setState({ sugg: [] }); this._setHome({ name: g.name.length > 18 ? g.name.slice(0, 17) + "…" : g.name, xy: g.xy }); } })),
+        homeKey: (ev) => { if (ev.key === "Enter") this._searchAddr(); }, homeSearch: () => this._searchAddr(),
+        homeSpots: Object.keys(Component.HOME_SPOTS[ck]).map(n => ({ label: n, go: () => this._setHome({ name: n, xy: Component.HOME_SPOTS[ck][n] }) })),
+        planNoHome: !hmx, openHomeFromPlan: () => this.setState({ homeOpen: true, homeEdit: true, mSheet: null }), closeHome: () => this.setState({ homeOpen: false, homeEdit: false, sugg: [] }), mNearLabel: hmx ? (hmx.name.length > 10 ? hmx.name.slice(0, 9) + "…" : hmx.name) : "Near me", homeOpenMob: !!s.homeOpen && mob, homeOpenDesk: !!s.homeOpen && !mob,
+        travelRows: [
+          { title: "SORT", opts: [["time", "Time"], ["nearest", "Nearest"]].map(([v, l]) => opt(s.tsort || "time", v, l, () => this.setState({ tsort: v }))) },
+          { title: "WITHIN", opts: [["10", "10 min"], ["20", "20 min"], ["30", "30 min"], ["any", "Any"]].map(([v, l]) => opt(s.within || "any", v, l, () => this.setState({ within: v, limit: 40 }))) },
+          { title: "TRAVEL MODE", opts: [["walk", "Walk"], ["drive", "Drive"], ["transit", "Transit"]].map(([v, l]) => opt(this._mode(), v, l, () => { try { localStorage.setItem("tw-tmode", v); } catch (e) {} this.setState({ tmode: v }); })) }
+        ]
+      });
+    }
+    layout.inFs = mob ? "16px" : "13px";
+    layout.nmDisp = mob ? "none" : "flex";
+    Object.assign(layout, mob ? { tsTop: "auto", tsBot: "calc(100px + env(safe-area-inset-bottom))", tsPad: "11px 18px", tsRad: "999px", tsBg: layout.gBg, tsBlur: "blur(22px) saturate(180%)", tsBd: layout.gBd, tsSh: "inset 0 1px 0 " + layout.gHi + ",0 10px 30px rgba(0,0,0,0.22)", tsFg: layout.gInk }
+      : { tsTop: "24px", tsBot: "auto", tsPad: "9px 16px", tsRad: "3px", tsBg: "#16181e", tsBlur: "none", tsBd: "rgba(255,255,255,0.2)", tsSh: "none", tsFg: "#ffffff" });
+    layout.qrOpen = !!s.qrOpen; layout.openQR = () => this.setState({ qrOpen: true }); layout.closeQR = () => this.setState({ qrOpen: false }); layout.stopProp = (e) => e.stopPropagation();
+    const tagsOn = !s.hideTags;
+    layout.tagTrack = tagsOn ? "#191919" : "#cfcfcf"; layout.tagKnob = tagsOn ? "13px" : "2px";
+    layout.toggleTags = () => { const h = !this.state.hideTags; try { localStorage.setItem("tw-hide-tags", h ? "1" : "0"); } catch (e) {} this.setState({ hideTags: h }, () => this._updateLabels(true)); };
+    return {
+      ...planVals, ...layout,
+      cityTitle: this._meta().title, cityDesc: this._meta().desc,
+      sfTabBg: s.city !== "la" ? "#ffffff" : "transparent", sfTabFg: s.city !== "la" ? "#191919" : (s.night ? "#3d3d3d" : "#565656"), laTabFg: s.city === "la" ? "#191919" : (s.night ? "#3d3d3d" : "#565656"), segTrack: s.night ? "#cfcfcf" : "#D9D9D9", rpGlass: s.night ? "rgba(255,255,255,0.86)" : "rgba(255,255,255,0.58)", laTabBg: s.city === "la" ? "#ffffff" : "transparent",
+      sfTabSh: s.city !== "la" ? "0 1px 3px rgba(0,0,0,0.12)" : "none", laTabSh: s.city === "la" ? "0 1px 3px rgba(0,0,0,0.12)" : "none",
+      goSF: () => this._switchTo("sf"), goLA: () => this._switchTo("la"),
+      query: s.query || "",
+      onQuery: (ev) => this.setState({ query: ev.target.value }),
+      eventCount: (shown.length === (this._events || []).length || shown.length >= (s.city === "la" ? 800 : 1700)) ? (s.city === "la" ? "800+" : "1700+") : String(shown.length),
+      eventCards: shown.slice(0, limit).map(e => ({ ...e,
+        planIcon: planSet.has(e.id) ? "" : "+", planText: planSet.has(e.id) ? "Planned" : "Plan",
+        planBg: planSet.has(e.id) ? "#e6f6ea" : "#191919", planBorder: planSet.has(e.id) ? "#1e7a3a" : "#191919", planFg: planSet.has(e.id) ? "#1e7a3a" : "#ffffff",
+        planTitle: planSet.has(e.id) ? "Remove from plan" : "Add to plan",
+        togglePlan: (ev) => { if (ev) { ev.preventDefault(); ev.stopPropagation(); } this._togglePlan(e.id); }, venue: [e.host, e.hood].filter(Boolean).join(" · ") + this._venueTravel(e), dayColor: Component.DAYC[e.day] || "#8e8e93", dateLabel: e.day + ", " + e.date.charAt(0) + e.date.slice(1, 3).toLowerCase() + e.date.slice(3) + " · " + (this._tba(e) ? "Time TBA" : e.time) })), dayPills,
+      hasMoreEvents: shown.length > limit,
+      moreEventsLabel: "Show " + Math.min(40, shown.length - limit) + " more",
+      loadMore: () => this.setState(st => ({ limit: (st.limit || 40) + 40 })),
+      eventsLoading: !this._events,
+      noEvents: !!this._events && shown.length === 0,
+      groups, hasSel: selCount > 0, selCount: String(selCount),
+      clearAll: () => this.setState({ filters: {} }),
+      filtersOpen: s.filtersOpen === true,
+      filtersChev: s.filtersOpen === true ? "rotate(180deg)" : "rotate(0deg)",
+      toggleFilters: () => this.setState(st => ({ filtersOpen: st.filtersOpen !== true })),
+      mapEl: (el) => { this._mapEl = el; },
+      clock: s.clock, dateStr: s.dateStr, tzLabel: c.tzLabel,
+      loading: s.loading, errorMsg: s.errorMsg, rainOn: s.rain,
+
+      nightBg: s.night ? "#34c759" : "rgba(120,120,128,0.32)",
+      nightKnob: s.night ? "translateX(18px)" : "translateX(0)",
+      rainBg: s.rain ? "#34c759" : "rgba(120,120,128,0.32)",
+      rainKnob: s.rain ? "translateX(18px)" : "translateX(0)",
+      isNight: !!s.night, isDay: !s.night, themeTitle: s.night ? "Switch to light map" : "Switch to dark map",
+      toggleNight: () => this.setState(st => ({ night: !st.night }), () => {
+        setTimeout(() => this._updateLabels(true), 50);
+        const map = this._map;
+        if (!map || !this._loaded) return;
+        this._evSrc = null; this._evSig = null;
+        map.once("style.load", () => { try { this._setupLayers(); this._syncEvents(); } catch (e) { console.error("theme swap", e); } });
+        map.setStyle(this._styleUrl(), { diff: false });
+      }),
+      toggleRain: () => this.setState(st => ({ rain: !st.rain }), () => this._tickStats()),
+      transitBg: s.transit ? "#34c759" : "rgba(120,120,128,0.32)",
+      transitKnob: s.transit ? "translateX(18px)" : "translateX(0)",
+      toggleTransit: () => this.setState(st => ({ transit: !st.transit }), () => this._setTransitVisibility()),
+      kVehicles: String(this._vehicles.length),
+      kFlow: totFlow >= 1000 ? (totFlow / 1000).toFixed(1) + "K" : String(totFlow),
+      kCo2: (totCo2 / 1000).toFixed(2),
+      kCost: "$" + (totCost >= 1000 ? (totCost / 1000).toFixed(1) + "K" : totCost),
+      junctionBtns: c.junctions.map(j => {
+        const jm = this._metrics[j.id];
+        const dot = !jm ? "#8494ad" : jm.cong > 0.75 ? "#d95c48" : jm.cong > 0.45 ? "#d9b23d" : "#4fae72";
+        const act = j.id === s.selected;
+        return {
+          name: j.name, dot,
+          flow: jm ? jm.flow + "/h" : "-",
+          bg: act ? "rgba(10,132,255,0.22)" : "rgba(118,118,128,0.12)",
+          border: act ? "rgba(10,132,255,0.6)" : "transparent",
+          go: () => this.setState({ selected: j.id }, () => {
+            this._updateJunctionRings();
+            if (this._map && this._loaded) this._map.easeTo({ center: j.lngLat, duration: 1400 });
+          })
+        };
+      }),
+      jName: sel.name, jStatus: status[0], jStatusColor: status[1],
+      jFlow: String(m.flow), jDelay: m.delay + "s",
+      jCo2: String(m.co2), jCost: "$" + m.cost,
+      jDaily: "$" + Math.round(m.cost * 24 / 100) / 10 + "K",
+      sparkBars,
+      orbiting: s.orbit !== false, notOrbiting: s.orbit === false,
+      orbitLabel: s.orbit !== false ? "ORBITING" : "ORBIT",
+      orbitBg: s.orbit !== false ? "#191919" : "rgba(120,120,128,0.32)",
+      toggleOrbit: () => this.setState(st => ({ orbit: st.orbit === false })),
+      orbitSpeedLabel: (s.orbitSpeed ?? 1) + "×",
+      orbitSlower: () => this.setState(st => ({ orbitSpeed: Math.max(0.5, (st.orbitSpeed ?? 1) / 2) })),
+      orbitFaster: () => this.setState(st => ({ orbitSpeed: Math.min(8, (st.orbitSpeed ?? 1) * 2) })),
+      orbitReverse: () => this.setState(st => ({ orbitDir: -(st.orbitDir ?? 1), orbit: true })),
+      retry: () => { try { if (this._map) this._map.remove(); } catch (e) {} this._map = null; this._loaded = false; this._styleFallback = false; this._evSrc = null; this._homeSig = null; this.setState({ errorMsg: null, loading: true }); this._waitForLib(); }
+    };
+  }
+}
+</script>
+</body>
+</html>
