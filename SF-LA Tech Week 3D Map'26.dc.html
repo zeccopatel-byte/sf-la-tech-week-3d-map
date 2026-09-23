@@ -1,37 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SF + LA Tech Week 2026 3D Map | Built by Zecco</title>
 <meta name="title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
-<meta name="description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
-<meta name="author" content="Zecco Patel">
+<meta name="description" content="Explore SF + LA Tech Week 2026 events, venues, and locations through an interactive 3D map. Built by Zecco.">
+<meta name="author" content="Zeco Patel">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/">
 <meta property="og:title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
-<meta property="og:description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
+<meta property="og:description" content="Explore SF + LA Tech Week 2026 events, venues, and locations through an interactive 3D map. Built by Zecco.">
 <meta property="og:image" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/og-image.png">
+<meta property="og:image:secure_url" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/og-image.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="628">
-<meta property="og:site_name" content="SF + LA Tech Week 3D Map">
+<meta property="og:site_name" content="SF + LA Tech Week 2026 3D Map">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/">
 <meta name="twitter:title" content="SF + LA Tech Week 2026 3D Map | Built by Zecco">
-<meta name="twitter:description" content="Interactive 3D map of SF and LA Tech Week 2026 events. Explore venues, dates and neighborhoods across both cities in one view. Designed and built by Zecco.">
+<meta name="twitter:description" content="Explore SF + LA Tech Week 2026 events, venues, and locations through an interactive 3D map. Built by Zecco.">
 <meta name="twitter:image" content="https://sf-la-tech-week-3d-map-26-8fb02d40.vercel.app/og-image.png">
+<link rel="icon" type="image/png" href="/assets/favicon-dark.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="/assets/favicon-light.png" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="/assets/favicon-dark.png">
 <script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
 <meta name="ext-resource-dependency" content="./assets/you-pin.png" data-resource-id="youPin">
+<meta name="ext-resource-dependency" content="./sf-events.json" data-resource-id="sfEvents">
+<meta name="ext-resource-dependency" content="./la-events.json" data-resource-id="laEvents">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/png" href="./assets/favicon-dark.png" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/png" href="./assets/favicon-light.png" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="./assets/favicon-dark.png">
 <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
-<script defer="" src="/_vercel/insights/script.js"></script>
+<script>if (/vercel\.app$|tech-week|zalak/.test(location.hostname) || !/claudeusercontent|localhost/.test(location.hostname)) { var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/" + "insights/script.js"; document.head.appendChild(s); }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
@@ -622,7 +629,8 @@ class Component extends DCLogic {
   _loadCity(city, fromHash) {
     const M = Component.META[city];
     this._events = null; this._evSig = null;
-    return fetch(M.file).then(r => r.json()).then(d => {
+    const R = window.__resources || {}, src = R[city === "la" ? "laEvents" : "sfEvents"] || M.file;
+    return fetch(src).then(r => r.json()).then(d => {
       if (this.state.city !== city) return;
       d.forEach((e, i) => { e.id = i; });
       this._events = d;
@@ -885,7 +893,7 @@ class Component extends DCLogic {
     const k = this.state.city === "la" ? "la" : "sf", homes = { ...(this.state.homes || {}) };
     if (h) homes[k] = h; else delete homes[k];
     try { localStorage.setItem("tw-homes", JSON.stringify(homes)); } catch (e) {}
-    if (h && this._map) { const mob = window.innerWidth < 820; if (this.state.orbit !== false) this.setState({ orbit: false }); this._map.easeTo({ center: h.xy, zoom: Math.max(13.6, Math.min(this._map.getZoom(), 14.6)), duration: 1400, padding: mob ? { top: 120, bottom: 120, left: 20, right: 20 } : { top: 60, bottom: 80, left: 330, right: 400 } }); }
+    if (h && this._map) { const mob = window.innerWidth < 820; if (this.state.orbit !== false) this.setState({ orbit: false }); this._skipFrame = true; setTimeout(() => { this._skipFrame = false; }, 800); if (this._popup) { this._popup.remove(); this._popup = null; } this._map.stop(); this._map.flyTo({ center: h.xy, zoom: 16.8, pitch: 60, bearing: this._map.getBearing(), duration: 2200, curve: 1.4, essential: true, padding: { top: 0, bottom: 0, left: 0, right: 0 }, offset: mob ? [0, 0] : (() => { const vw = window.innerWidth, L = Math.min(300, Math.max(240, vw * 0.2)) + 32, R = Math.min(380, Math.max(300, vw * 0.24)) + 32; return [Math.round((L - R) / 2), 0]; })() }); }
     this.setState({ homes, homeOpen: !h ? this.state.homeOpen : false, homeEdit: false, homeQ: "", ...(h ? { within: "20", tsort: "nearest", limit: 40 } : { within: "any", tsort: "time" }) });
   }
   _inCity(xy) {
